@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Calendar with Event Modal</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/index.global.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/index.global.min.css" rel="stylesheet"> -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
     <style>
         body {
             font-family: sans-serif;
@@ -45,98 +44,182 @@
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
 
+            // helper functions
+            function escapeHtml(s) {
+                if (!s && s !== 0) return '';
+                return String(s)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function formatDate(d) {
+                if (!d) return '';
+                // English style: MM/DD/YYYY hh:mm AM/PM
+                return new Date(d).toLocaleString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+
+            async function fetchTypes() {
+                // returns array of { id, slug, name } or [] on error
+                try {
+                    const res = await fetch(`${BASE_URL}/routes/events.php?action=types`);
+                    if (!res.ok) throw new Error('Network response not ok');
+                    const json = await res.json();
+                    return Array.isArray(json) ? json : [];
+                } catch (e) {
+                    console.warn('fetchTypes error', e);
+                    return [];
+                }
+            }
+
+            // Initialize calendar
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridDay',
+                initialView: 'timeGridWeek',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 selectable: true,
-                editable: true, // إن أردت السحب والتعديل مباشرة
+                // editable: true,
+
+                // Load events from backend (FullCalendar calls this when needed)
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    const url = `${BASE_URL}/routes/events.php?action=events&start=${encodeURIComponent(fetchInfo.startStr)}&end=${encodeURIComponent(fetchInfo.endStr)}`;
+                    fetch(url)
+                        .then(r => {
+                            if (!r.ok) throw new Error('Network response not ok');
+                            return r.json();
+                        })
+                        .then(data => successCallback(data))
+                        .catch(err => {
+                            console.error('load events error', err);
+                            failureCallback(err);
+                        });
+                },
 
                 // ----------------- Add event (select) -----------------
                 select: async function (info) {
-                    const { value: formValues } = await Swal.fire({
+                    // Fetch the types (equipment options) from backend
+                    const types = await fetchTypes();
+                    const typeOptionsHtml = types.length
+                        ? types.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.equipment_name ?? t.slug)}</option>`).join('')
+                        : '<option value="">-- No types available --</option>';
+
+                    const { value: form } = await Swal.fire({
                         title: 'Add New Event',
                         html: `
                             <div style="display:flex;flex-direction:column;gap:10px;text-align:left;">
-                            <input id="event-title" class="swal2-input" placeholder="Event Title">
+                                <input id="ev-title" class="swal2-input" placeholder="Event title">
 
-                            <select id="type" class="swal2-input" style="box-sizing:border-box;">
-                                <option value="">-- Select Type --</option>
-                                <option value="execution">Execution</option>
-                                <option value="requester">Requester</option>
-                                <option value="admin">Admin</option>
-                            </select>
+                                <select id="ev-type" class="swal2-input" style="box-sizing: border-box; width:100%;">
+                                <option value="">-- Select Equipment Type --</option>
+                                ${typeOptionsHtml}
+                                </select>
 
-                            <input id="swal-start" class="swal2-input" placeholder="Start Date & Time">
-                            <input id="swal-end" class="swal2-input" placeholder="End Date & Time (optional)">
+                                <input id="ev-start" class="swal2-input" placeholder="Start">
+                                <input id="ev-end" class="swal2-input" placeholder="End (optional)">
 
-                            <input id="area" class="swal2-input" placeholder="Area">
-                            <input id="location" class="swal2-input" placeholder="Location">
-                            <input id="worktype" class="swal2-input" placeholder="Work Type">
+                                <input id="ev-area" class="swal2-input" placeholder="Area">
+                                <input id="ev-location" class="swal2-input" placeholder="Location">
+                                <input id="ev-worktype" class="swal2-input" placeholder="Work type">
 
-                            <textarea id="desc" class="swal2-textarea" placeholder="Additional details"></textarea>
+                                <textarea id="ev-desc" class="swal2-textarea" placeholder="Description"></textarea>
                             </div>
                         `,
                         didOpen: () => {
-                            // initialize flatpickr on the text inputs inside Swal
-                            flatpickr('#swal-start', {
+                            // initialize flatpickr on the inputs inside Swal
+                            // Flatpickr works on selectors; ensure these IDs exist
+                            flatpickr('#ev-start', {
                                 enableTime: true,
                                 dateFormat: "Y-m-d H:i",
                                 defaultDate: info.startStr
                             });
-                            flatpickr('#swal-end', {
+                            flatpickr('#ev-end', {
                                 enableTime: true,
                                 dateFormat: "Y-m-d H:i",
                                 defaultDate: info.endStr || null
                             });
+
+                            // Fix select sizing inside Swal (in case global CSS needed)
+                            const sel = document.getElementById('ev-type');
+                            if (sel) {
+                                sel.style.width = '100%';
+                                sel.style.boxSizing = 'border-box';
+                                sel.style.height = '2.5em';
+                                sel.style.padding = '0 8px';
+                            }
                         },
                         focusConfirm: false,
                         showCancelButton: true,
                         confirmButtonText: 'Add',
                         cancelButtonText: 'Cancel',
                         preConfirm: () => {
-                            const title = document.getElementById('event-title').value.trim();
-                            const start = document.getElementById('swal-start').value.trim();
-                            const end = document.getElementById('swal-end').value.trim();
-                            const type = document.getElementById('type').value;
-                            const area = document.getElementById('area').value.trim();
-                            const location = document.getElementById('location').value.trim();
-                            const worktype = document.getElementById('worktype').value.trim();
-                            const description = document.getElementById('desc').value.trim();
+                            const equipment_id = parseInt(document.getElementById('ev-type').value);
+                            const title = document.getElementById('ev-title').value.trim();
+                            const start = document.getElementById('ev-start').value.trim();
+                            const end = document.getElementById('ev-end').value.trim();
+                            const area = document.getElementById('ev-area').value.trim();
+                            const location = document.getElementById('ev-location').value.trim();
+                            const worktype = document.getElementById('ev-worktype').value.trim();
+                            const description = document.getElementById('ev-desc').value.trim();
 
                             if (!title || !start) {
-                                Swal.showValidationMessage('Please enter a title and a start date/time.');
+                                Swal.showValidationMessage('Title and Start are required.');
                                 return false;
                             }
 
-                            return { title, start, end, type, area, location, worktype, description };
+                            return { equipment_id, title, start, end, area, location, worktype, description };
                         }
                     });
 
-                    if (formValues) {
-                        calendar.addEvent({
-                            title: formValues.title,
-                            start: formValues.start,
-                            end: formValues.end || null,
-                            extendedProps: {
-                                type: formValues.type || '',
-                                area: formValues.area || '',
-                                location: formValues.location || '',
-                                worktype: formValues.worktype || '',
-                                description: formValues.description || ''
-                            }
-                        });
+                    if (!form) {
+                        calendar.unselect();
+                        return;
+                    }
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Added',
-                            text: 'Event added successfully.',
-                            timer: 1500,
-                            showConfirmButton: false
+                    // Send to backend to store
+                    try {
+                        const res = await fetch(`${BASE_URL}/routes/events.php?action=add`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(form)
                         });
+                        const json = await res.json();
+
+                        if (json.success && json.id) {
+                            // add to calendar with returned id
+                            calendar.addEvent({
+                                id: json.id,
+                                equipment_id: form.equipment_id,
+                                title: form.title,
+                                start: form.start,
+                                end: form.end || null,
+                                extendedProps: {
+                                    type: form.type,
+                                    area: form.area,
+                                    location: form.location,
+                                    worktype: form.worktype,
+                                    description: form.description
+                                }
+                            });
+
+                            Swal.fire({ icon: 'success', title: 'Added', text: 'Event added successfully.', timer: 1400, showConfirmButton: false });
+                        } else {
+                            Swal.fire('Error', json.message || 'Add failed', 'error');
+                        }
+                    } catch (e) {
+                        console.error('add event error', e);
+                        Swal.fire('Error', 'Server error while adding event', 'error');
                     }
 
                     calendar.unselect();
@@ -144,123 +227,65 @@
 
                 // ----------------- Click on event (view + delete) -----------------
                 eventClick: function (info) {
-                    console.log('Event clicked:', info.event); // debug: ensure click fires
-
                     const props = info.event.extendedProps || {};
-                    const area = props.area || '—';
-                    const location = props.location || '—';
-                    const worktype = props.worktype || '—';
-                    const type = props.type || '—';
-                    const description = props.description || '';
-
-                    const htmlContent = `
-                        <div style="text-align:left;line-height:1.4;">
-                            <h3 style="margin:0 0 8px;">${escapeHtml(info.event.title)}</h3>
-
-                            <div><strong>From:</strong> ${formatDate(info.event.start)}</div>
-                            ${info.event.end ? `<div><strong>To:</strong> ${formatDate(info.event.end)}</div>` : ''}
-
-                            <hr style="margin:8px 0;">
-
-                            <div><strong>Type:</strong> ${escapeHtml(type)}</div>
-                            <div><strong>Area:</strong> ${escapeHtml(area)}</div>
-                            <div><strong>Location:</strong> ${escapeHtml(location)}</div>
-                            <div><strong>Work Type:</strong> ${escapeHtml(worktype)}</div>
-
-                            ${description ? `<hr style="margin:8px 0;"><div><strong>Description:</strong><div style="margin-top:6px;">${escapeHtml(description)}</div></div>` : ''}
-                        </div>
-                    `;
+                    const html = `
+                                <div style="text-align:left; line-height:1.4;">
+                                <strong>Title:</strong> ${escapeHtml(info.event.title)}<br/>
+                                <strong>Equipment name:</strong> ${escapeHtml(props.equipment_name || '')}<br/>
+                                <strong>From:</strong> ${formatDate(info.event.start)}<br/>
+                                ${info.event.end ? `<strong>To:</strong> ${formatDate(info.event.end)}<br/>` : ''}
+                                <strong>Area:</strong> ${escapeHtml(props.area || '')}<br/>
+                                <strong>Location:</strong> ${escapeHtml(props.location || '')}<br/>
+                                <strong>Work type:</strong> ${escapeHtml(props.worktype || '')}<br/>
+                                ${props.description ? `<hr><div>${escapeHtml(props.description)}</div>` : ''}
+                                </div>
+                            `;
 
                     Swal.fire({
                         title: 'Event Details',
-                        html: htmlContent,
-                        icon: 'info',
+                        html,
                         showCancelButton: true,
                         showDenyButton: true,
                         confirmButtonText: 'Close',
-                        denyButtonText: '🗑 Delete Event',
-                        showCancelButton: false
-                    }).then((result) => {
-                        if (result.isDenied) {
-                            Swal.fire({
-                                title: 'Are you sure?',
-                                text: 'This event will be permanently deleted!',
+                        denyButtonText: 'Delete'
+                    }).then(async (r) => {
+                        if (r.isDenied) {
+                            const confirm = await Swal.fire({
+                                title: 'Confirm delete?',
                                 icon: 'warning',
                                 showCancelButton: true,
-                                confirmButtonText: 'Yes, delete it',
+                                confirmButtonText: 'Yes, delete',
                                 cancelButtonText: 'Cancel'
-                            }).then((confirmResult) => {
-                                if (confirmResult.isConfirmed) {
-                                    // remove from calendar UI
-                                    info.event.remove();
-
-                                    // optional: delete on backend
-                                    // fetch(`${BASE_URL}/routes/events.php`, {
-                                    //   method: 'POST',
-                                    //   headers: { 'Content-Type': 'application/json' },
-                                    //   body: JSON.stringify({ action: 'delete', id: info.event.id })
-                                    // });
-
-                                    Swal.fire('Deleted!', 'The event has been deleted.', 'success');
-                                }
                             });
+                            if (!confirm.isConfirmed) return;
+
+                            // delete on backend
+                            try {
+                                const res = await fetch(`${BASE_URL}/routes/events.php?action=delete`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: info.event.id })
+                                });
+                                const json = await res.json();
+                                if (json.success) {
+                                    info.event.remove();
+                                    Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+                                } else {
+                                    Swal.fire('Error', json.message || 'Delete failed', 'error');
+                                }
+                            } catch (e) {
+                                console.error('delete event error', e);
+                                Swal.fire('Error', 'Server error while deleting event', 'error');
+                            }
                         }
                     });
-                },
+                }
 
-                // you can add other options (events, eventSources, etc.)
+                // other FullCalendar options can be added here
             });
 
-            // render after config
             calendar.render();
-
-            // ----------------- helper functions (place once in your script) -----------------
-            function formatDate(dateObj) {
-                if (!dateObj) return '—';
-                return dateObj.toLocaleString('en-US', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-            }
-            function escapeHtml(str) {
-                if (typeof str !== 'string') return str;
-                return str.replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            }
-
-
-            function formatDate(dateObj) {
-                if (!dateObj) return '—';
-                return dateObj.toLocaleString('en-US', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-            }
-
-            function escapeHtml(str) {
-                if (typeof str !== 'string') return str;
-                return str
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            }
-
-            calendar.render();
-        });
-    </script>
+        });</script>
 
 </body>
 

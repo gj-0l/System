@@ -17,4 +17,34 @@ class ChecklistController
 
         echo json_encode(['success' => true, 'message' => '✔️ تم حفظ النتائج بنجاح']);
     }
+
+    public static function getAcceptedEquipmentsByDate($date = null, $status = 'accepted')
+    {
+        $db = Database::getInstance()->getConnection();
+
+        if ($date === null) {
+            $date = date('Y-m-d');
+        }
+
+        try {
+            $sql = "
+                SELECT DISTINCT e.*
+                FROM equipment e
+                INNER JOIN checklist_items ci ON ci.equipment_id = e.id
+                INNER JOIN checklist_results cr ON cr.checklist_id = ci.id
+                WHERE cr.date = ? AND cr.status = ?
+                ORDER BY e.id ASC
+            ";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$date, $status]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $rows ?: [];
+        } catch (PDOException $e) {
+            // Log the error if you have a logger, otherwise silently return empty array
+            error_log("ChecklistController::getAcceptedEquipmentsByDate error: " . $e->getMessage());
+            return [];
+        }
+    }
 }
