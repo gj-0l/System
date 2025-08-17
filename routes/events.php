@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../controllers/ChecklistController.php';
 require_once __DIR__ . '/../controllers/CalenderController.php';
+require_once __DIR__ . '/../controllers/NotificationController.php';
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
@@ -34,6 +35,17 @@ if ($method === 'POST') {
         case 'add':
             $res = CalendarController::addEvent($input);
             echo json_encode($res);
+            // ✅ إرسال إشعار إذا تم الحفظ بنجاح
+            if ($res['success']) {
+                NotificationController::sendNotification(
+                    'حدث جديد',
+                    "تمت إضافة حدث جديد: {$input['title']}",
+                    [27, 24], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
+                    BASE_URL . '/public/requester/event?id=0011219736.php',
+                    $_SESSION['user_id'] ?? null
+                );
+            }
+
             break;
         case 'delete':
             $id = $input['id'] ?? null;

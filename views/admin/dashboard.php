@@ -5,6 +5,49 @@
     <meta charset="UTF-8" />
     <title> dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
+
+    <script>
+        // إعداد Firebase (استبدل القيم بقيمك)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBwxIvQua1PMFur2bonw3ZSkRd2IL36e_A",
+            authDomain: "mobile-equipment-3ac58.firebaseapp.com",
+            projectId: "mobile-equipment-3ac58",
+            storageBucket: "mobile-equipment-3ac58.firebasestorage.app",
+            messagingSenderId: "736129810254",
+            appId: "1:736129810254:web:1f70eaa87ec803279fa81f",
+            measurementId: "G-DYC99K0M32", // يمكن وضعها هنا أو في دالة getToken مباشرة
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const messaging = firebase.messaging();
+
+        // اطلب إذن الإشعارات وجلب التوكن
+        messaging.requestPermission()
+            .then(() => messaging.getToken({ vapidKey: 'BLvVVJkkOyQNHDeca15iLwY7RLOqIf5xWooimnt_xWjqyGN7b6Q2I59qsX5WizmlrNRyuo57QqmCOpqaiJ90Da0' }))
+            .then((currentToken) => {
+                if (currentToken) {
+                    // أرسل التوكن للسيرفر
+                    fetch('../../routes/notifications.php?action=save_token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: currentToken })
+                    }).then(res => {
+                        if (res.ok) {
+                            console.log("تم حفظ التوكن بنجاح.");
+                        }
+                    }).catch(err => console.error("خطأ في حفظ التوكن:", err));
+                } else {
+                    console.log('لا يوجد توكن للإشعارات.');
+                }
+            })
+            .catch((err) => {
+                console.error('فشل في الحصول على إذن الإشعارات أو التوكن:', err);
+            });
+    </script>
+
     <style>
         * {
             box-sizing: border-box;

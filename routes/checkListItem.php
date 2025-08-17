@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/ChecklistItemController.php';
+require_once __DIR__ . '/../controllers/NotificationController.php';
 
 session_start();
 header('Content-Type: application/json');
@@ -35,7 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
+            // حفظ الفحص
             $result = ChecklistItemController::store($equipment_id, $test_name, $initial_action, $default_status);
+
+            // ✅ إرسال إشعار إذا تم الحفظ بنجاح
+            if ($result['success']) {
+                NotificationController::sendNotification(
+                    '📋 فحص جديد',
+                    "تمت إضافة فحص جديد: {$test_name}",
+                    [27, 24], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
+                    BASE_URL . '/public/requester/event?id=0011219736.php',
+                    $_SESSION['user_id'] ?? null
+                );
+            }
+
             echo json_encode($result);
             exit;
         }
