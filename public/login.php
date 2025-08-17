@@ -7,13 +7,13 @@ session_start();
 if (isset($_SESSION['user_type'])) {
     switch ($_SESSION['user_type']) {
         case 'execution':
-            header("Location: " . BASE_URL . "/executer.php");
+            header("Location: " . BASE_URL . "/public/executer.php");
             exit();
         case 'requester':
-            header("Location: " . BASE_URL . "/requester_dashboard.php");
+            header("Location: " . BASE_URL . "/public/requester_calender.php");
             exit();
         case 'admin':
-            header("Location: " . BASE_URL . "/dashboard/dashboard.php");
+            header("Location: " . BASE_URL . "/public/dashboard.php");
             exit();
     }
 }
