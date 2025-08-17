@@ -40,7 +40,7 @@ if ($method === 'POST') {
                 NotificationController::sendNotification(
                     'حدث جديد',
                     "تمت إضافة حدث جديد: {$input['title']}",
-                    [27, 24], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
+                    [3], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
                     BASE_URL . '/public/requester/event?id=0011219736.php',
                     $_SESSION['user_id'] ?? null
                 );
