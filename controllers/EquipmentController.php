@@ -16,14 +16,6 @@ class EquipmentController
             $stmt = $db->prepare("INSERT INTO equipment (equipment_name, equipment_code, description) VALUES (?, ?, ?)");
             $stmt->execute([$name, $code, $description]);
 
-            sendNotification([
-                'title' => 'تمت إضافة معدة جديدة',
-                'body' => "تمت إضافة المعدة: $name",
-                'user_ids' => [2], // ID المستخدم المستهدف
-                'url' => BASE_URL . '/public/equipment.php', // رابط الصفحة التي سيتم فتحها عند الضغط على الإشعار
-                'sender_id' => $_SESSION['user_id'] ?? null
-            ]);
-
             return [
                 'success' => true,
                 'message' => 'تمت إضافة المعدة بنجاح'

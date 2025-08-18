@@ -80,8 +80,8 @@
         <h3 style="text-align:center;"> user List</h3>
 
         <?php
-        $pdo = new PDO("mysql:host=localhost;dbname=user_system;charset=utf8mb4", "root", "");
-        $stmt = $pdo->query("SELECT id, name, email, type FROM users ORDER BY id DESC");
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->query("SELECT id, name, email, type FROM users ORDER BY id DESC");
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ?>
 
