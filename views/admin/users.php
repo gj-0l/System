@@ -101,7 +101,7 @@ require_once __DIR__ . '/../config/config.php';
 
     <script>
         // جلب البيانات من الراوت
-        fetch('<?= BASE_URL ?>/routes/auth.php?action=list')
+        fetch('../routes/notifications.php?action=get_notifications')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('userTableBody');
