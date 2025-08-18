@@ -1,6 +1,6 @@
 <?php
-session_start();
-require_once __DIR__ . '/../config/config.php';
+require_once '../core/Database.php';
+require_once '../config/config.php';
 ?>
 
 <!DOCTYPE html>
@@ -101,7 +101,7 @@ require_once __DIR__ . '/../config/config.php';
 
     <script>
         // جلب البيانات من الراوت
-        fetch('../routes/notifications.php?action=get_notifications')
+        fetch('../routes/user.php?action=get_users')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('userTableBody');
