@@ -18,6 +18,18 @@
             margin: 20px;
         }
 
+        .navbar {
+            background: #0f766e;
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
         #calendar {
             max-width: 1000px;
             margin: 0 auto;
@@ -37,6 +49,10 @@
 </head>
 
 <body>
+    <div class="navbar">
+        <div>Mobile Equipment</div>
+        <div><a href="logout.php" style="color:white; text-decoration: none;">Logout</a></div>
+    </div>
 
     <div id="calendar"></div>
 
