@@ -2,6 +2,8 @@
 
 function sendNotification($data)
 {
+    ob_start(); // ← يمنع أي مخرجات غير مرغوبة
+
     require_once __DIR__ . '/../core/Database.php';
     $pdo = Database::getInstance()->getConnection();
 
@@ -25,6 +27,8 @@ function sendNotification($data)
     }
 
     sendFirebaseNotification($title, $body, $user_ids, $url);
+
+    ob_end_clean(); // ← تنظيف أي مخرجات
 }
 
 function sendFirebaseNotification($title, $body, $user_ids, $url = '')
@@ -32,8 +36,8 @@ function sendFirebaseNotification($title, $body, $user_ids, $url = '')
     require __DIR__ . '/../config/firebase.php';
     $pdo = Database::getInstance()->getConnection();
 
-    // get tokens
-    $tokens_stmt = $pdo->prepare("SELECT token FROM users WHERE id IN (" . implode(',', array_fill(0, count($user_ids), '?')) . ")");
+    $placeholders = implode(',', array_fill(0, count($user_ids), '?'));
+    $tokens_stmt = $pdo->prepare("SELECT token FROM users WHERE id IN ($placeholders)");
     $tokens_stmt->execute($user_ids);
     $tokens = $tokens_stmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -62,5 +66,11 @@ function sendFirebaseNotification($title, $body, $user_ids, $url = '')
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
     $result = curl_exec($ch);
+
+    // اختياري: خزن النتيجة بملف للمراقبة إذا صار خلل
+    if (curl_errno($ch)) {
+        file_put_contents(__DIR__ . '/notification_errors.log', curl_error($ch) . "\n", FILE_APPEND);
+    }
+
     curl_close($ch);
 }
