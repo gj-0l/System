@@ -107,20 +107,25 @@ require_once '../config/config.php';
                 const tbody = document.getElementById('userTableBody');
                 tbody.innerHTML = '';
 
-                if (!Array.isArray(data)) {
+                if (!data.success) {
+                    tbody.innerHTML = `<tr><td colspan="4">${data.message || 'حدث خطأ في جلب البيانات'}</td></tr>`;
+                    return;
+                }
+
+                if (!Array.isArray(data.users)) {
                     tbody.innerHTML = '<tr><td colspan="4">حدث خطأ في جلب البيانات</td></tr>';
                     return;
                 }
 
-                data.forEach((user, index) => {
+                data.users.forEach((user, index) => {
                     const row = document.createElement('tr');
 
                     row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                        <td>${user.type}</td>
-                    `;
+                <td>${index + 1}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.type}</td>
+            `;
 
                     tbody.appendChild(row);
                 });
@@ -130,6 +135,7 @@ require_once '../config/config.php';
                 document.getElementById('userTableBody').innerHTML =
                     '<tr><td colspan="4">فشل في الاتصال بالخادم</td></tr>';
             });
+
     </script>
 
 </body>
