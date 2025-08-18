@@ -101,7 +101,7 @@ require_once '../config/config.php';
 
     <script>
         // جلب البيانات من الراوت
-        fetch('../routes/user.php?action=get_users')
+        fetch('../routes/auth.php?action=get_users')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('userTableBody');

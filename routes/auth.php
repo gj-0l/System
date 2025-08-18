@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'get_users' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_SESSION['user_id'])) {
         $users = AuthController::list();
-        echo json_encode(['success' => true, 'users' => $notifications]);
+        echo json_encode(['success' => true, 'users' => $users]);
     } else {
         echo json_encode(['success' => false, 'message' => 'User not authenticated']);
     }
