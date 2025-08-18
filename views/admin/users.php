@@ -1,9 +1,14 @@
+<?php
+session_start();
+require_once __DIR__ . '/../config/config.php';
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
-    <title> show user </title>
+    <title>Show Users</title>
     <style>
         body {
             font-family: 'Cairo', sans-serif;
@@ -73,19 +78,13 @@
 
     <div class="container">
         <div class="logout">
-            <a href="<?= BASE_URL ?>/public/logout.php"> Logout</a>
+            <a href="<?= BASE_URL ?>/public/logout.php">Logout</a>
         </div>
 
         <h1>Welcome <?= $_SESSION['user_name'] ?> 👋</h1>
-        <h3 style="text-align:center;"> user List</h3>
+        <h3 style="text-align:center;">User List</h3>
 
-        <?php
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT id, name, email, type FROM users ORDER BY id DESC");
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        ?>
-
-        <table>
+        <table id="usersTable">
             <thead>
                 <tr>
                     <th>#</th>
@@ -94,18 +93,44 @@
                     <th>Type</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php foreach ($users as $index => $user): ?>
-                    <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><?= htmlspecialchars($user['name']) ?></td>
-                        <td><?= htmlspecialchars($user['email']) ?></td>
-                        <td><?= htmlspecialchars($user['type']) ?></td>
-                    </tr>
-                <?php endforeach; ?>
+            <tbody id="userTableBody">
+                <!-- سيتم ملؤه عبر JavaScript -->
             </tbody>
         </table>
     </div>
+
+    <script>
+        // جلب البيانات من الراوت
+        fetch('<?= BASE_URL ?>/routes/auth.php?action=list')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('userTableBody');
+                tbody.innerHTML = '';
+
+                if (!Array.isArray(data)) {
+                    tbody.innerHTML = '<tr><td colspan="4">حدث خطأ في جلب البيانات</td></tr>';
+                    return;
+                }
+
+                data.forEach((user, index) => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.type}</td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+                document.getElementById('userTableBody').innerHTML =
+                    '<tr><td colspan="4">فشل في الاتصال بالخادم</td></tr>';
+            });
+    </script>
 
 </body>
 

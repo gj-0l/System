@@ -64,6 +64,16 @@ class AuthController
         }
     }
 
+    public static function list()
+    {
+        $db = Database::getInstance()->getConnection();
+
+        $stmt = $db->query("SELECT * FROM users ORDER BY id ASC");
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $users;
+    }
+
     public static function logout()
     {
         session_start();
