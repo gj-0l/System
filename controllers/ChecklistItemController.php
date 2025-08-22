@@ -111,14 +111,28 @@ class ChecklistItemController
 
     public static function delete($id)
     {
+        $db = Database::getInstance()->getConnection();
+
         try {
-            $db = Database::getInstance()->getConnection();
             $stmt = $db->prepare("DELETE FROM checklist_items WHERE id = ?");
             $stmt->execute([$id]);
 
-            echo json_encode(['success' => true, 'message' => 'تم الحذف بنجاح']);
+            if ($stmt->rowCount() > 0) {
+                return [
+                    'success' => true,
+                    'message' => 'تم حذف العنصر بنجاح'
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'العنصر غير موجود أو تم حذفه مسبقاً'
+                ];
+            }
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => 'حدث خطأ في الحذف: ' . $e->getMessage()]);
+            return [
+                'success' => false,
+                'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()
+            ];
         }
     }
 }

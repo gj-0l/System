@@ -105,9 +105,9 @@ if ($requestMethod === 'DELETE') {
     $input = json_decode(file_get_contents("php://input"), true);
     $id = intval($input['id'] ?? 0);
 
-    if ($id <= 0) {
-        respond(['success' => false, 'message' => 'معرّف الفحص غير صالح']);
-    }
+    // if ($id <= 0) {
+    //     respond(['success' => false, 'message' => 'معرّف الفحص غير صالح']);
+    // }
 
     ChecklistItemController::delete($id);
     respond(['success' => true, 'message' => 'تم حذف الفحص بنجاح']);

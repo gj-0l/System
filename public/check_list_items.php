@@ -157,9 +157,14 @@ $items = ChecklistItemController::list();
         cancelButtonText: 'إلغاء'
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch("<?= BASE_URL ?>/routes/checklist_item.php?id=" + id, {
+          fetch("<?= BASE_URL ?>/routes/checkListItem.php", {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: id })
           })
+
             .then(response => response.json())
             .then(data => {
               if (data.success) {

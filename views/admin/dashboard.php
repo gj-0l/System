@@ -149,8 +149,10 @@
             <a href="../public/add_equipment.php">➕ Add equipment</a>
             <a href="../public/equipments.php">➕ Equipments List</a>
 
-            <a href="../public/add_check_item.php">✅ إضافة الجيك (Checklist)</a>
             <a href="../public/users.php">👥 Users List </a>
+
+            <a href="../public/add_check_item.php">✅ إضافة الجيك (Checklist)</a>
+            <a href="../public/check_list_items.php">قائمة الـ check</a>
         </div>
 
         <div class="logout">
