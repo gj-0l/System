@@ -30,11 +30,27 @@ class ChecklistItemController
     {
         $db = Database::getInstance()->getConnection();
 
-        $stmt = $db->query("SELECT * FROM checklist_items ORDER BY id ASC");
-        $checkListItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // استخدام JOIN للحصول على بيانات الفحص مع اسم المعدة دفعة واحدة
+        $query = "
+        SELECT 
+            ci.id,
+            ci.test_name,
+            ci.initial_action,
+            ci.default_status,
+            ci.equipment_id,
+            e.equipment_name,
+            e.equipment_code
+        FROM checklist_items ci
+        LEFT JOIN equipment e ON ci.equipment_id = e.id
+        ORDER BY ci.id ASC
+    ";
 
-        return $checkListItems;
+        $stmt = $db->query($query);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $items;
     }
+
 
     public static function getChecklistItems($equipment_id)
     {
@@ -43,6 +59,54 @@ class ChecklistItemController
         $stmt->execute([$equipment_id]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($items);
+    }
+
+    public static function get($id)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        $stmt = $db->prepare("SELECT * FROM checklist_items WHERE id = ?");
+        $stmt->execute([$id]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        //get equipment details by equipment_id
+        $equipment_id = $item['equipment_id'];
+        $stmt = $db->prepare("SELECT * FROM equipment WHERE id = ?");
+        $stmt->execute([$equipment_id]);
+        $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($item) {
+            return [
+                'success' => true,
+                'item' => $item,
+                'equipment' => $equipment
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'عنصر القائمة غير موجود'
+            ];
+        }
+    }
+
+    public static function update($id, $equipment_id, $test_name, $initial_action, $default_status)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        try {
+            $stmt = $db->prepare("UPDATE checklist_items SET equipment_id = ?, test_name = ?, initial_action = ?, default_status = ? WHERE id = ?");
+            $stmt->execute([$equipment_id, $test_name, $initial_action, $default_status, $id]);
+
+            return [
+                'success' => true,
+                'message' => 'تم التحديث بنجاح'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'حدث خطأ أثناء التحديث: ' . $e->getMessage()
+            ];
+        }
     }
 
     public static function delete($id)
@@ -57,7 +121,4 @@ class ChecklistItemController
             echo json_encode(['success' => false, 'message' => 'حدث خطأ في الحذف: ' . $e->getMessage()]);
         }
     }
-
-
-
 }

@@ -28,7 +28,7 @@
                 <input type="password" name="password" placeholder="كلمة المرور" required />
             </div>
             <input type="submit" value="دخول" class="btn" />
-            <p>لا تملك حساب؟ <a href="register.php">إنشاء حساب</a></p>
+            <p>لا تملك حساب؟ <a href=" <?= BASE_URL ?>/public/add_user.php">إنشاء حساب</a></p>
         </form>
     </div>
 

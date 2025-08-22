@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../controllers/EquipmentController.php';
+require_once __DIR__ . '/../controllers/ChecklistItemController.php';
 
 session_start();
 if (empty($_SESSION['auth_token'])) {
@@ -8,37 +8,37 @@ if (empty($_SESSION['auth_token'])) {
   exit();
 }
 
-$equipments = EquipmentController::list();
+$items = ChecklistItemController::list();
 ?>
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>قائمة المعدات</title>
+  <meta charset="UTF-8">
+  <title>قائمة عناصر الفحص</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to right, #e0f7ec, #a8e6cf);
+      background: linear-gradient(to right, #f1f8e9, #c8e6c9);
       padding: 20px;
       direction: rtl;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
       background: #fff;
-      padding: 20px 30px;
+      padding: 25px 30px;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 128, 0, 0.15);
+      box-shadow: 0 8px 20px rgba(0, 128, 0, 0.1);
     }
 
     h2 {
-      color: #2e7d32;
       text-align: center;
-      margin-bottom: 25px;
+      color: #388e3c;
+      margin-bottom: 20px;
     }
 
     table {
@@ -50,11 +50,11 @@ $equipments = EquipmentController::list();
     th,
     td {
       padding: 12px 15px;
-      border-bottom: 1px solid #c8e6c9;
+      border-bottom: 1px solid #a5d6a7;
     }
 
     th {
-      background-color: #a8e6cf;
+      background-color: #c8e6c9;
       color: #2e7d32;
     }
 
@@ -63,7 +63,7 @@ $equipments = EquipmentController::list();
     }
 
     .btn-delete {
-      background-color: #e53935;
+      background-color: #d32f2f;
       color: white;
       border: none;
       padding: 6px 12px;
@@ -74,18 +74,17 @@ $equipments = EquipmentController::list();
     }
 
     .btn-delete:hover {
-      background-color: #ab000d;
+      background-color: #9a0007;
     }
 
     .btn-update {
-      background-color: #3587e5ff;
+      background-color: #1976d2;
       color: white;
       border: none;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
-      transition: background-color 0.3s ease;
     }
 
     .btn-update a {
@@ -110,33 +109,34 @@ $equipments = EquipmentController::list();
 <body>
   <div class="container">
     <a href="<?= BASE_URL ?>/public/dashboard.php" class="back-link">⬅ العودة إلى لوحة التحكم</a>
-    <h2>قائمة المعدات</h2>
+    <h2>قائمة عناصر الفحص</h2>
 
-    <?php if (count($equipments) === 0): ?>
-      <p>لا توجد معدات مضافة بعد.</p>
+    <?php if (count($items) === 0): ?>
+      <p>لا توجد عناصر حتى الآن.</p>
     <?php else: ?>
       <table>
         <thead>
           <tr>
-            <th>رقم</th>
-            <th>اسم المعدة</th>
-            <th>رقم المعدة</th>
-            <th>الوصف</th>
-            <th>الإجراءات</th>
+            <th>#</th>
+            <th>المعدة</th>
+            <th>نوع الفحص</th>
+            <th>الحالة الابتدائية</th>
+            <th>الإجراء الأولي</th>
+            <th>التحكم</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($equipments as $equip): ?>
+          <?php foreach ($items as $item): ?>
             <tr>
-              <td><?= htmlspecialchars($equip['id']) ?></td>
-              <td><?= htmlspecialchars($equip['equipment_name']) ?></td>
-              <td><?= htmlspecialchars($equip['equipment_code']) ?></td>
-              <td><?= nl2br(htmlspecialchars($equip['description'])) ?></td>
+              <td><?= htmlspecialchars($item['id']) ?></td>
+              <td><?= htmlspecialchars($item['equipment_name']) ?></td>
+              <td><?= htmlspecialchars($item['test_name']) ?></td>
+              <td><?= htmlspecialchars($item['default_status']) ?></td>
+              <td><?= htmlspecialchars($item['initial_action']) ?></td>
               <td>
-                <button class="btn-delete" onclick="confirmDelete(<?= $equip['id'] ?>, this.closest('tr'))">حذف</button>
+                <button class="btn-delete" onclick="confirmDelete(<?= $item['id'] ?>, this.closest('tr'))">حذف</button>
                 <button class="btn-update"><a
-                    href="<?= BASE_URL . '/public/update_equipment.php?id=' . $equip['id'] ?>">تعديل</a></button>
-
+                    href="<?= BASE_URL . '/public/update_check_item.php?id=' . $item['id'] ?>">تعديل</a></button>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -148,42 +148,34 @@ $equipments = EquipmentController::list();
   <script>
     function confirmDelete(id, rowElement) {
       Swal.fire({
-        title: 'هل أنت متأكد أنك تريد الحذف؟',
+        title: 'هل أنت متأكد من الحذف؟',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#e53935',
-        cancelButtonColor: '#43a047',
+        confirmButtonColor: '#d32f2f',
+        cancelButtonColor: '#388e3c',
         confirmButtonText: 'نعم، احذف',
         cancelButtonText: 'إلغاء'
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch("<?= BASE_URL ?>/routes/equipment.php", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              action: "delete",
-              id: id
-            })
+          fetch("<?= BASE_URL ?>/routes/checklist_item.php?id=" + id, {
+            method: "DELETE",
           })
             .then(response => response.json())
             .then(data => {
               if (data.success) {
-                Swal.fire("تم الحذف!", data.message, "success");
-                rowElement.remove();  // حذف الصف من الجدول
+                Swal.fire("تم الحذف", data.message, "success");
+                rowElement.remove();
               } else {
                 Swal.fire("خطأ", data.message, "error");
               }
             })
             .catch(() => {
-              Swal.fire("خطأ", "حدث خطأ أثناء الاتصال بالخادم", "error");
+              Swal.fire("خطأ", "فشل الاتصال بالخادم", "error");
             });
         }
       });
     }
   </script>
-
 </body>
 
 </html>

@@ -149,8 +149,6 @@
             <a href="../public/add_equipment.php">➕ Add equipment</a>
             <a href="../public/equipments.php">➕ Equipments List</a>
 
-            <a href="../public/add_user.php">👤 Create User</a>
-
             <a href="../public/add_check_item.php">✅ إضافة الجيك (Checklist)</a>
             <a href="../public/users.php">👥 Users List </a>
         </div>

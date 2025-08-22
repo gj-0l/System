@@ -8,7 +8,7 @@ require_once __DIR__ . '/../notifications/send_notification.php';
 
 class EquipmentController
 {
-    public static function storeAjax($name, $code, $description)
+    public static function create($name, $code, $description)
     {
         $db = Database::getInstance()->getConnection();
 
@@ -39,7 +39,48 @@ class EquipmentController
         return $equipments;
     }
 
-    public static function deleteAjax($id)
+    public static function get($id)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        $stmt = $db->prepare("SELECT * FROM equipment WHERE id = ?");
+        $stmt->execute([$id]);
+        $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($equipment) {
+            return [
+                'success' => true,
+                'equipment' => $equipment
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'المعدة غير موجودة'
+            ];
+        }
+    }
+
+    public static function update($id, $name, $code, $description)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        try {
+            $stmt = $db->prepare("UPDATE equipment SET equipment_name = ?, equipment_code = ?, description = ? WHERE id = ?");
+            $stmt->execute([$name, $code, $description, $id]);
+
+            return [
+                'success' => true,
+                'message' => 'تم تحديث المعدة بنجاح'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'حدث خطأ أثناء التحديث: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public static function delete($id)
     {
         try {
             $db = Database::getInstance()->getConnection();
