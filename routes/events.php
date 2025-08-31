@@ -16,18 +16,22 @@ $action = $_GET['action'] ?? ($_POST['action'] ?? null);
 if ($method === 'GET') {
     switch ($action) {
         case 'types':
-            echo json_encode(ChecklistController::getAcceptedEquipmentsByDate());
+            $date = $_GET['date'] ?? date('Y-m-d');
+            echo json_encode(ChecklistController::getNotRejectedEquipments($date));
             break;
+
         case 'events':
             $start = $_GET['start'] ?? null;
             $end = $_GET['end'] ?? null;
             echo json_encode(CalendarController::getEvents($start, $end));
             break;
+
         default:
             echo json_encode(['error' => 'Invalid GET action']);
     }
     exit;
 }
+
 
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;

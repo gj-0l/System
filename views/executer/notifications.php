@@ -126,6 +126,8 @@ require_once '../config/config.php';
         </div>
 
         <a href="<?= BASE_URL ?>/public/checklist.php" class="link">All Asset Types</a>
+        <br>
+        <a href="<?= BASE_URL ?>/public/executer_dashboard.php" class="link">Dashboard</a>
 
         <div id="notifications-container">
             <!-- Notifications will be dynamically loaded here -->

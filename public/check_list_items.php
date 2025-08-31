@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/ChecklistItemController.php';
+require_once __DIR__ . '/../core/Database.php';
 
 session_start();
 if (empty($_SESSION['auth_token'])) {
@@ -8,7 +9,8 @@ if (empty($_SESSION['auth_token'])) {
   exit();
 }
 
-$items = ChecklistItemController::list();
+$db = Database::getInstance()->getConnection();
+$equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equipment_name ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +64,16 @@ $items = ChecklistItemController::list();
       background-color: #f1f8f4;
     }
 
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
     .btn-delete {
       background-color: #d32f2f;
       color: white;
@@ -111,41 +123,80 @@ $items = ChecklistItemController::list();
     <a href="<?= BASE_URL ?>/public/dashboard.php" class="back-link">⬅ العودة إلى لوحة التحكم</a>
     <h2>قائمة عناصر الفحص</h2>
 
-    <?php if (count($items) === 0): ?>
-      <p>لا توجد عناصر حتى الآن.</p>
-    <?php else: ?>
+    <!-- Dropdown لاختيار المعدة -->
+    <label for="equipmentSelect">اختر المعدة:</label>
+    <select id="equipmentSelect">
+      <option value="">-- اختر --</option>
+      <?php foreach ($equipments as $eq): ?>
+        <option value="<?= $eq['id'] ?>"><?= htmlspecialchars($eq['equipment_name']) ?></option>
+      <?php endforeach; ?>
+    </select>
+
+    <!-- جدول العناصر -->
+    <div id="itemsContainer" style="margin-top:20px; display:none;">
       <table>
         <thead>
           <tr>
             <th>#</th>
-            <th>المعدة</th>
             <th>نوع الفحص</th>
             <th>الحالة الابتدائية</th>
             <th>الإجراء الأولي</th>
             <th>التحكم</th>
           </tr>
         </thead>
-        <tbody>
-          <?php foreach ($items as $item): ?>
-            <tr>
-              <td><?= htmlspecialchars($item['id']) ?></td>
-              <td><?= htmlspecialchars($item['equipment_name']) ?></td>
-              <td><?= htmlspecialchars($item['test_name']) ?></td>
-              <td><?= htmlspecialchars($item['default_status']) ?></td>
-              <td><?= htmlspecialchars($item['initial_action']) ?></td>
-              <td>
-                <button class="btn-delete" onclick="confirmDelete(<?= $item['id'] ?>, this.closest('tr'))">حذف</button>
-                <button class="btn-update"><a
-                    href="<?= BASE_URL . '/public/update_check_item.php?id=' . $item['id'] ?>">تعديل</a></button>
-              </td>
-            </tr>
-          <?php endforeach; ?>
+        <tbody id="itemsTableBody">
+          <!-- يملأ بالـ JS -->
         </tbody>
       </table>
-    <?php endif; ?>
+    </div>
   </div>
 
   <script>
+    document.getElementById("equipmentSelect").addEventListener("change", function () {
+      let equipmentId = this.value;
+      if (!equipmentId) {
+        document.getElementById("itemsContainer").style.display = "none";
+        return;
+      }
+
+      fetch("<?= BASE_URL ?>/routes/checkListItem.php?equipment_id=" + equipmentId, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          let tbody = document.getElementById("itemsTableBody");
+          tbody.innerHTML = "";
+
+          if (!data || data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5'>لا توجد عناصر لهذه المعدة.</td></tr>";
+          } else {
+            data.forEach(item => {
+              let row = `
+              <tr>
+                <td>${item.id}</td>
+                <td>${item.test_name}</td>
+                <td>${item.default_status}</td>
+                <td>${item.initial_action}</td>
+                <td>
+                  <button class="btn-delete" onclick="confirmDelete(${item.id}, this.closest('tr'))">حذف</button>
+                  <button class="btn-update">
+                    <a href="<?= BASE_URL ?>/public/update_check_item.php?id=${item.id}">تعديل</a>
+                  </button>
+                </td>
+              </tr>
+            `;
+              tbody.insertAdjacentHTML("beforeend", row);
+            });
+          }
+
+          document.getElementById("itemsContainer").style.display = "block";
+        })
+        .catch(() => {
+          Swal.fire("خطأ", "فشل الاتصال بالخادم", "error");
+        });
+    });
+
     function confirmDelete(id, rowElement) {
       Swal.fire({
         title: 'هل أنت متأكد من الحذف؟',
@@ -164,7 +215,6 @@ $items = ChecklistItemController::list();
             },
             body: JSON.stringify({ id: id })
           })
-
             .then(response => response.json())
             .then(data => {
               if (data.success) {
@@ -181,6 +231,7 @@ $items = ChecklistItemController::list();
       });
     }
   </script>
+
 </body>
 
 </html>

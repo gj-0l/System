@@ -11,7 +11,8 @@ switch ($action) {
         break;
     case 'getChecklist':
         $id = $_GET['id'] ?? 0;
-        ChecklistItemController::getChecklistItems($id);
+        $items = ChecklistItemController::getChecklistItems($id);
+        echo json_encode($items);
         break;
     case 'submitChecklist':
         ChecklistController::submitChecklist();

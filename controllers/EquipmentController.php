@@ -39,6 +39,40 @@ class EquipmentController
         return $equipments;
     }
 
+    public static function listWithTodayStatus()
+    {
+        $db = Database::getInstance()->getConnection();
+        $date = date('Y-m-d');
+
+        try {
+            $sql = "
+                SELECT 
+                e.*, 
+                COALESCE(MAX(cr.status), 'in process') AS status
+                FROM equipment e
+                LEFT JOIN checklist_items ci 
+                    ON ci.equipment_id = e.id
+                LEFT JOIN checklist_results cr 
+                    ON cr.checklist_id = ci.id 
+                    AND DATE(cr.date) = ?
+                GROUP BY e.id
+                ORDER BY e.id ASC
+            ";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$date]);
+            $equipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $equipments;
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'خطأ أثناء جلب المعدات: ' . $e->getMessage()
+            ];
+        }
+    }
+
+
     public static function get($id)
     {
         $db = Database::getInstance()->getConnection();

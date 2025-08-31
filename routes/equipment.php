@@ -21,16 +21,19 @@ function respond($data)
     exit;
 }
 
-// معالجة طلبات GET (جلب معدة حسب ID)
+// معالجة طلبات GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $id = intval($_GET['id'] ?? 0);
 
-    if ($id <= 0) {
-        respond(['success' => false, 'message' => 'معرّف المعدة غير صالح']);
+    if ($id > 0) {
+        // إذا انطيت id → يجيب معدة وحدة
+        $result = EquipmentController::get($id);
+        respond($result);
+    } else {
+        // إذا ماكو id → يجيب كل المعدات مع حالتها اليوم
+        $result = EquipmentController::listWithTodayStatus();
+        respond($result);
     }
-
-    $result = EquipmentController::get($id);
-    respond($result);
 }
 
 // معالجة طلبات POST (store, update, delete)
@@ -77,8 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 respond(['success' => false, 'message' => 'معرّف المعدة غير صالح']);
             }
 
-            $result = EquipmentController::delete($id);
-            respond($result);
+            EquipmentController::delete($id);
+            respond(['success' => true, 'message' => 'تم حذف المعدة بنجاح']);
 
         default:
             respond(['success' => false, 'message' => 'عملية غير معروفة']);

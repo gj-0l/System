@@ -22,6 +22,7 @@ function respond($data)
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 // ✅ GET: getById / list
+// ✅ GET: getById / list / getByEquipment
 if ($requestMethod === 'GET') {
     // ?id=5 → جلب فحص معين
     if (isset($_GET['id'])) {
@@ -35,14 +36,26 @@ if ($requestMethod === 'GET') {
         respond($result);
     }
 
-    // ?list أو ?equipment_id=xx → جلب قائمة الفحوصات
+    // ?equipment_id=xx → جلب عناصر المعدة المحددة
+    if (isset($_GET['equipment_id'])) {
+        $equipment_id = intval($_GET['equipment_id']);
+        if ($equipment_id <= 0) {
+            respond(['success' => false, 'message' => 'معرّف المعدة غير صالح']);
+        }
+
+        $result = ChecklistItemController::getChecklistItems($equipment_id);
+        respond($result);
+    }
+
+    // ?list → جلب جميع الفحوصات
     if (isset($_GET['list'])) {
-        $result = ChecklistItemController::list(); // لو صفر يرجع الكل
+        $result = ChecklistItemController::list();
         respond($result);
     }
 
     respond(['success' => false, 'message' => 'طلب غير صالح']);
 }
+
 
 // ✅ POST: store / update
 if ($requestMethod === 'POST') {
@@ -95,8 +108,8 @@ if ($requestMethod === 'POST') {
             $result = ChecklistItemController::update($id, $equipment_id, $test_name, $initial_action, $default_status);
             respond($result);
 
-        default:
-            respond(['success' => false, 'message' => 'عملية غير صالحة']);
+        // default:
+        //     respond(['success' => false, 'message' => 'عملية غير صالحة']);
     }
 }
 

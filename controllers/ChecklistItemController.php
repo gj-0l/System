@@ -25,12 +25,10 @@ class ChecklistItemController
         }
     }
 
-
     public static function list()
     {
         $db = Database::getInstance()->getConnection();
 
-        // استخدام JOIN للحصول على بيانات الفحص مع اسم المعدة دفعة واحدة
         $query = "
         SELECT 
             ci.id,
@@ -43,7 +41,7 @@ class ChecklistItemController
         FROM checklist_items ci
         LEFT JOIN equipment e ON ci.equipment_id = e.id
         ORDER BY ci.id ASC
-    ";
+        ";
 
         $stmt = $db->query($query);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -51,14 +49,13 @@ class ChecklistItemController
         return $items;
     }
 
-
     public static function getChecklistItems($equipment_id)
     {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("SELECT * FROM checklist_items WHERE equipment_id = ?");
         $stmt->execute([$equipment_id]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($items);
+        return $items; // ← رجع بيانات بدون echo
     }
 
     public static function get($id)
@@ -69,24 +66,23 @@ class ChecklistItemController
         $stmt->execute([$id]);
         $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        //get equipment details by equipment_id
-        $equipment_id = $item['equipment_id'];
-        $stmt = $db->prepare("SELECT * FROM equipment WHERE id = ?");
-        $stmt->execute([$equipment_id]);
-        $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($item) {
-            return [
-                'success' => true,
-                'item' => $item,
-                'equipment' => $equipment
-            ];
-        } else {
+        if (!$item) {
             return [
                 'success' => false,
                 'message' => 'عنصر القائمة غير موجود'
             ];
         }
+
+        $equipment_id = $item['equipment_id'];
+        $stmt = $db->prepare("SELECT * FROM equipment WHERE id = ?");
+        $stmt->execute([$equipment_id]);
+        $equipment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'success' => true,
+            'item' => $item,
+            'equipment' => $equipment
+        ];
     }
 
     public static function update($id, $equipment_id, $test_name, $initial_action, $default_status)
