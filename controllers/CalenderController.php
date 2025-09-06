@@ -197,7 +197,8 @@ class CalendarController
                 'description' => $event['description'],
                 'created_by' => $event['created_by'],
                 'created_by_id' => $event['created_by_id'], // ✅ هنا
-                'status' => $event['status']
+                'status' => $event['status'],
+                'cancellation_reason' => $event['cancellation_reason'] ?? null
             ];
         } else {
             return null;

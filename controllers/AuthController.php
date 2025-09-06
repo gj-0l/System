@@ -107,9 +107,9 @@ class AuthController
         $db = Database::getInstance()->getConnection();
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Generate a unique token by combining user info + randomness
+        // Generate a unique token
         $raw_token = $name . $email . bin2hex(random_bytes(16)) . time();
-        $token = hash('sha256', $raw_token); // 64-char hashed token
+        $token = hash('sha256', $raw_token);
 
         $status = 'inactive'; // Default status
 
@@ -117,10 +117,19 @@ class AuthController
             $stmt = $db->prepare("INSERT INTO users (name, email, password, type, status, token) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$name, $email, $hashed_password, $type, $status, $token]);
 
+            // جيب آخر ID مضاف
+            $user_id = $db->lastInsertId();
+
+            // جيب بيانات المستخدم كاملة
+            $userStmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+            $userStmt->execute([$user_id]);
+            $userData = $userStmt->fetch(PDO::FETCH_ASSOC);
+
             return [
                 'success' => true,
                 'message' => 'Join request sent, please wait for admin approval.',
-                'token' => $token
+                'token' => $token,
+                'data' => $userData
             ];
         } catch (PDOException $e) {
             return [
@@ -129,6 +138,7 @@ class AuthController
             ];
         }
     }
+
 
     public static function update_user($id, $name, $email, $password, $type, $status)
     {

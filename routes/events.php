@@ -100,7 +100,7 @@ if ($method === 'POST') {
                     'executer started',
                     "executer started working on your request {$res['token']}",
                     [$requesterId], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
-                    BASE_URL . '/public/events.php',
+                    BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
                     'requester',
                 );
@@ -141,7 +141,7 @@ if ($method === 'POST') {
                     'request cancelled',
                     "executer cancelled your request {$res['token']}",
                     [$requesterId], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
-                    BASE_URL . '/public/events.php',
+                    BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
                     'requester',
                 );

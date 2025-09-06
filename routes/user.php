@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'New join request',
                     "New join requested by: {$name}",
                     null, // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
-                    BASE_URL . '/public/users.php',
+                    BASE_URL . '/public/update_user.php?id=' . $res['data']['id'],
                     $_SESSION['user_id'] ?? null,
                     'admin',
                 );
