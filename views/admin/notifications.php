@@ -124,11 +124,6 @@ require_once '../config/config.php';
             Notifications
             <span class="notification-badge" id="notif-count">0</span>
         </div>
-
-        <a href="<?= BASE_URL ?>/public/requester_calendar.php" class="link">calendar</a>
-        <br>
-        <a href="<?= BASE_URL ?>/public/events.php" class="link">today requests</a>
-
         <div id="notifications-container">
             <!-- Notifications will be dynamically loaded here -->
         </div>
