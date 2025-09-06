@@ -183,15 +183,15 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire("نجاح", data.message, "success").then(() => {
+                        Swal.fire("sucess", data.message, "success").then(() => {
 
                         });
                     } else {
-                        Swal.fire("خطأ", data.message, "error");
+                        Swal.fire("error", data.message, "error");
                     }
                 })
                 .catch(() => {
-                    Swal.fire("خطأ", "فشل الاتصال بالخادم", "error");
+                    Swal.fire("error", "server error", "error");
                 });
         }
 

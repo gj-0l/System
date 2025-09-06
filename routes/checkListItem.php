@@ -82,15 +82,15 @@ if ($requestMethod === 'POST') {
             $result = ChecklistItemController::store($equipment_id, $test_name, $initial_action, $default_status);
 
             // إرسال إشعار بعد الحفظ
-            if ($result['success']) {
-                NotificationController::sendNotification(
-                    '📋 فحص جديد',
-                    "تمت إضافة فحص جديد: {$test_name}",
-                    [27, 24], // ← غيّر المعرفات حسب الحاجة
-                    BASE_URL . '/public/requester/event?id=0011219736.php',
-                    $_SESSION['user_id'] ?? null
-                );
-            }
+            // if ($result['success']) {
+            //     NotificationController::sendNotification(
+            //         '📋 فحص جديد',
+            //         "تمت إضافة فحص جديد: {$test_name}",
+            //         [27, 24], // ← غيّر المعرفات حسب الحاجة
+            //         BASE_URL . '/public/requester/event?id=0011219736.php',
+            //         $_SESSION['user_id'] ?? null
+            //     );
+            // }
 
             respond($result);
 

@@ -107,15 +107,25 @@ class NotificationController
     }
 
     // Optional: get user notifications
-    public static function getUserNotifications($user_id, $is_oppened = false)
+    public static function getUserNotifications($user_id, $is_opened = false)
     {
         $db = Database::getInstance()->getConnection();
-        $query = "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC";
-        if ($is_oppened) {
-            $query .= " AND is_opened = 1";
+
+        $query = "SELECT n.*, u.name AS sender_name
+              FROM notifications n
+              LEFT JOIN users u ON n.sender_id = u.id
+              WHERE n.user_id = ?";
+
+        if ($is_opened) {
+            $query .= " AND n.is_opened = 1";
         }
+
+        $query .= " ORDER BY n.created_at DESC";
+
         $stmt = $db->prepare($query);
         $stmt->execute([$user_id]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 }

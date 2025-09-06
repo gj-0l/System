@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
+require_once __DIR__ . '/../controllers/NotificationController.php';
+
 
 header('Content-Type: application/json');
 session_start();
@@ -25,7 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $type = trim($input['type'] ?? '');
 
             if ($name && $email && $password && $type) {
-                respond(AuthController::add_user($name, $email, $password, $type));
+                $res = AuthController::add_user($name, $email, $password, $type);
+
+                // if ($res['success']) {
+                NotificationController::sendNotification(
+                    'New join request',
+                    "New join requested by: {$name}",
+                    null, // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
+                    BASE_URL . '/public/users.php',
+                    $_SESSION['user_id'] ?? null,
+                    'admin',
+                );
+                respond($res);
+                // }
             } else {
                 respond(['success' => false, 'message' => 'جميع الحقول مطلوبة']);
             }

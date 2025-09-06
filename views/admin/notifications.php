@@ -125,9 +125,9 @@ require_once '../config/config.php';
             <span class="notification-badge" id="notif-count">0</span>
         </div>
 
-        <a href="<?= BASE_URL ?>/public/checklist.php" class="link">All Asset Types</a>
+        <a href="<?= BASE_URL ?>/public/requester_calendar.php" class="link">calendar</a>
         <br>
-        <a href="<?= BASE_URL ?>/public/executer_dashboard.php" class="link">Dashboard</a>
+        <a href="<?= BASE_URL ?>/public/events.php" class="link">today requests</a>
 
         <div id="notifications-container">
             <!-- Notifications will be dynamically loaded here -->
@@ -154,6 +154,7 @@ require_once '../config/config.php';
                         card.className = 'notif-card';
                         card.innerHTML = `
                         <a href="${notif.url || '#'}" class="notif-header" target="_blank">
+                            ${notif.title || 'Notification'}
                             <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
                             <div class="notif-body">
                                 ${notif.title ? `<strong>${notif.title}</strong><br>` : ''}

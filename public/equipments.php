@@ -1,3 +1,13 @@
+<?php
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../controllers/EquipmentController.php';
+
+session_start();
+if (empty($_SESSION['auth_token'])) {
+  header("Location: " . BASE_URL . "/public/login.php");
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -22,7 +32,6 @@
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0, 128, 0, 0.15);
       overflow-x: auto;
-      /* يسمح بالتمرير للجدول */
     }
 
     h2 {
@@ -76,7 +85,7 @@
     }
 
     .btn-update {
-      background-color: #3587e5ff;
+      background-color: #3587e5;
       color: white;
     }
 
@@ -103,7 +112,6 @@
       text-decoration: underline;
     }
 
-    /* Media Queries للشاشات الصغيرة */
     @media (max-width: 768px) {
 
       table,
@@ -138,12 +146,6 @@
         display: inline-block;
         width: 120px;
       }
-
-      .btn-delete,
-      .btn-update {
-        width: 100%;
-        margin-top: 5px;
-      }
     }
   </style>
 </head>
@@ -153,39 +155,60 @@
     <a href="<?= BASE_URL ?>/public/dashboard.php" class="back-link">⬅ العودة إلى لوحة التحكم</a>
     <h2>قائمة المعدات</h2>
 
-    <?php if (count($equipments) === 0): ?>
-      <p>لا توجد معدات مضافة بعد.</p>
-    <?php else: ?>
-      <table>
-        <thead>
-          <tr>
-            <th>رقم</th>
-            <th>اسم المعدة</th>
-            <th>رقم المعدة</th>
-            <th>الوصف</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($equipments as $equip): ?>
-            <tr>
-              <td data-label="رقم"><?= htmlspecialchars($equip['id']) ?></td>
-              <td data-label="اسم المعدة"><?= htmlspecialchars($equip['equipment_name']) ?></td>
-              <td data-label="رقم المعدة"><?= htmlspecialchars($equip['equipment_code']) ?></td>
-              <td data-label="الوصف"><?= nl2br(htmlspecialchars($equip['description'])) ?></td>
-              <td data-label="الإجراءات">
-                <button class="btn-delete" onclick="confirmDelete(<?= $equip['id'] ?>, this.closest('tr'))">حذف</button>
-                <button class="btn-update"><a
-                    href="<?= BASE_URL . '/public/update_equipment.php?id=' . $equip['id'] ?>">تعديل</a></button>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    <?php endif; ?>
+    <table id="equipmentsTable">
+      <thead>
+        <tr>
+          <th>رقم</th>
+          <th>اسم المعدة</th>
+          <th>رقم المعدة</th>
+          <th>الوصف</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="5">⏳ جارٍ تحميل البيانات...</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <script>
+    const BASE_URL = <?= json_encode(BASE_URL) ?>;
+    const tbody = document.querySelector("#equipmentsTable tbody");
+
+    async function loadEquipments() {
+      try {
+        const res = await fetch(`${BASE_URL}/routes/equipment.php`);
+        const equipments = await res.json();
+
+        tbody.innerHTML = "";
+
+        if (!Array.isArray(equipments) || equipments.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5">لا توجد معدات</td></tr>`;
+          return;
+        }
+
+        equipments.forEach((equip, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td data-label="رقم">${index + 1}</td>
+            <td data-label="اسم المعدة">${equip.equipment_name || "-"}</td>
+            <td data-label="رقم المعدة">${equip.equipment_code || "-"}</td>
+            <td data-label="الوصف">${equip.description || "-"}</td>
+            <td data-label="الإجراءات">
+              <button class="btn-delete" onclick="confirmDelete(${equip.id}, this.closest('tr'))">حذف</button>
+              <button class="btn-update"><a href="${BASE_URL}/public/update_equipment.php?id=${equip.id}">تعديل</a></button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="5">⚠️ خطأ في الاتصال بالسيرفر</td></tr>`;
+      }
+    }
+
     function confirmDelete(id, rowElement) {
       Swal.fire({
         title: 'هل أنت متأكد أنك تريد الحذف؟',
@@ -195,28 +218,30 @@
         cancelButtonColor: '#43a047',
         confirmButtonText: 'نعم، احذف',
         cancelButtonText: 'إلغاء'
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          fetch("<?= BASE_URL ?>/routes/equipment.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "delete", id: id })
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire("تم الحذف!", data.message, "success");
-                rowElement.remove();
-              } else {
-                Swal.fire("خطأ", data.message, "error");
-              }
-            })
-            .catch(() => {
-              Swal.fire("خطأ", "حدث خطأ أثناء الاتصال بالخادم", "error");
+          try {
+            const res = await fetch(`${BASE_URL}/routes/equipment.php`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "delete", id })
             });
+            const data = await res.json();
+
+            if (data.success) {
+              Swal.fire("تم الحذف!", data.message, "success");
+              rowElement.remove();
+            } else {
+              Swal.fire("خطأ", data.message, "error");
+            }
+          } catch {
+            Swal.fire("خطأ", "حدث خطأ أثناء الاتصال بالخادم", "error");
+          }
         }
       });
     }
+
+    loadEquipments();
   </script>
 </body>
 

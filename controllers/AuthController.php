@@ -119,7 +119,7 @@ class AuthController
 
             return [
                 'success' => true,
-                'message' => 'تمت إضافة المستخدم بنجاح',
+                'message' => 'Join request sent, please wait for admin approval.',
                 'token' => $token
             ];
         } catch (PDOException $e) {

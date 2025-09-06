@@ -63,8 +63,8 @@ if ($method === 'POST') {
             // ✅ إرسال إشعار إذا تم الحفظ بنجاح
             if ($res['success']) {
                 NotificationController::sendNotification(
-                    'Equipment Book request',
-                    "New Equipment book added: {$input['title']}",
+                    "PR: {$input['token']}",
+                    "Location: {$input['location']}",
                     null, // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
                     BASE_URL . '/public/event.php?id=' . $input['token'],
                     $_SESSION['user_id'] ?? null,

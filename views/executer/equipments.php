@@ -5,7 +5,7 @@ require_once '../config/config.php';
 ?>
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@ require_once '../config/config.php';
             font-family: 'Cairo', sans-serif;
             background: #f1f1f1;
             padding: 20px;
-            direction: rtl;
+            direction: ltr;
         }
 
         .container {

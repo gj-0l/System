@@ -333,10 +333,11 @@ session_start()
                     : '<option value="">-- No types available --</option>';
 
                 const { value: form } = await Swal.fire({
-                    title: `Add New Event #${createToken()}`,
+                    title: `Add New Event`,
                     html: `
                     <div style="display:flex;flex-direction:column;gap:10px;text-align:left;">
                         <input id="ev-title" class="swal2-input" placeholder="Event title">
+                        <label>PR: ${createToken()}</label>
                         <select id="ev-type" class="swal2-input">${typeOptionsHtml}</select>
                         <input id="ev-start" class="swal2-input" placeholder="Start time">
                         <input id="ev-end" class="swal2-input" placeholder="End time">
@@ -424,14 +425,14 @@ session_start()
                     <div style="text-align:left; line-height:1.4;">
                         <strong>Title:</strong> ${escapeHtml(info.event.title)}<br/>
                         <strong>PR:</strong> ${props.token}<br/>
-                        <strong>Status:</strong> ${props.status}<br/>
-                        <strong>Equipment name:</strong> ${escapeHtml(props.equipment_name || '')}<br/>
-                        <strong>Created by:</strong> ${escapeHtml(props.created_by || '')}<br/>
-                        <strong>Executer start:</strong> ${formatDate(props.executer_start) || '-'}<br/>
-                        ${info.event.end ? `<strong>To:</strong> ${formatDate(info.event.end)}<br/>` : ''}
+                        <strong>Created by:</strong> ${escapeHtml(props.created_by_name || '')}<br/>
                         <strong>Area:</strong> ${escapeHtml(props.area || '')}<br/>
                         <strong>Location:</strong> ${escapeHtml(props.location || '')}<br/>
                         <strong>Work type:</strong> ${escapeHtml(props.worktype || '')}<br/>
+                        <strong>Status:</strong> ${props.status}<br/>
+                        <strong>Equipment name:</strong> ${escapeHtml(props.equipment_name || '')}<br/>
+                        <strong>Executer start:</strong> ${formatDate(props.executer_start) || '-'}<br/>
+                        ${info.event.end ? `<strong>To:</strong> ${formatDate(info.event.end)}<br/>` : ''}
                         ${props.description ? `<hr><div>${escapeHtml(props.description)}</div>` : ''}
                     </div>
                 `;

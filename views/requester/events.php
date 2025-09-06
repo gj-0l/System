@@ -182,7 +182,7 @@ require_once '../config/config.php';
                 confirmButtonText: "تأكيد الحذف"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`${BASE_URL} /routes/events.php ? action = delete`, {
+                    fetch(`${BASE_URL}/routes/events.php?action=delete`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

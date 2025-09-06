@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
@@ -49,6 +49,18 @@
     </script>
 
     <style>
+        .navbar {
+            background: #0f766e;
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -63,7 +75,7 @@
             justify-content: center;
             align-items: flex-start;
             padding: 40px 20px;
-            direction: rtl;
+            direction: ltr;
         }
 
         .dashboard-container {
@@ -143,6 +155,17 @@
 <body>
 
     <div class="dashboard-container">
+        <div class="navbar">
+            <div>
+                <span>Mobile Equipment - <?= $_SESSION['user_name'] ?></span>
+                <span>-</span>
+            </div>
+            <div>
+                <a href="admin.php" style="color:white; text-decoration:none; margin-left:10px;">Notifications</a>
+                <a href="logout.php"
+                    style="color:red; background-color: white; padding: 2px 6px; border-radius: 16px; text-decoration:none; margin-left:10px;">Logout</a>
+            </div>
+        </div>
         <h1> Welcome to the control panel </h1>
 
         <div class="nav-buttons">
