@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>إضافة معدّة</title>
+    <title>KCML</title>
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- <link rel="stylesheet" href="../public/css/style.css"> -->
@@ -37,7 +37,7 @@
 
         .title {
             text-align: center;
-            color: #2e7d32;
+            color: #1d8e96;
             font-size: 28px;
             margin-bottom: 30px;
             font-weight: bold;
@@ -69,7 +69,7 @@
         .btn {
             width: 100%;
             padding: 14px;
-            background-color: #43a047;
+            background-color: #0b6f76;
             border: none;
             border-radius: 8px;
             color: white;
@@ -80,7 +80,7 @@
         }
 
         .btn:hover {
-            background-color: #388e3c;
+            background-color: #22939b;
         }
 
         p {
@@ -90,7 +90,7 @@
         }
 
         a {
-            color: #2e7d32;
+            color: #1d8e96;
             font-weight: bold;
             text-decoration: none;
         }
@@ -138,7 +138,7 @@
                 icon: 'error',
                 title: 'خطأ',
                 text: <?= json_encode($error) ?>,
-                confirmButtonColor: '#43a047'
+                confirmButtonColor: '#0b6f76'
             });
         <?php endif; ?>
 
@@ -146,7 +146,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'تمت الإضافة بنجاح',
-                confirmButtonColor: '#43a047'
+                confirmButtonColor: '#0b6f76'
             }).then(() => {
                 document.getElementById('equipmentForm').reset();
             });

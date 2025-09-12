@@ -1,23 +1,21 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
 ?>
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <title>Show Users</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #f1f1f1;
-            padding: 20px;
-            direction: rtl;
-        }
-
         .container {
             max-width: 900px;
             margin: auto;
@@ -29,7 +27,7 @@ require_once '../config/config.php';
 
         h1 {
             text-align: center;
-            color: #2e7d32;
+            color: #1d8e96;
             margin-bottom: 30px;
         }
 
@@ -76,30 +74,29 @@ require_once '../config/config.php';
 </head>
 
 <body>
+    <?php renderNavbar('Users List'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('users'); ?>
 
-    <div class="container">
-        <div class="logout">
-            <a href="<?= BASE_URL ?>/public/logout.php">Logout</a>
-        </div>
+        <main class="p-6 ml-4 md:pl-64" dir="rtl">
+            <h3 style="text-align:center;">User List</h3>
 
-        <h1>Welcome <?= $_SESSION['user_name'] ?> 👋</h1>
-        <h3 style="text-align:center;">User List</h3>
-
-        <table id="usersTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>action</th>
-                </tr>
-            </thead>
-            <tbody id="userTableBody">
-                <!-- سيتم ملؤه عبر JavaScript -->
-            </tbody>
-        </table>
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- سيتم ملؤه عبر JavaScript -->
+                </tbody>
+            </table>
+        </main>
     </div>
 
     <script>

@@ -28,7 +28,7 @@ require_once '../config/config.php';
 
         h1 {
             text-align: center;
-            color: #2e7d32;
+            color: #1d8e96;
             margin-bottom: 30px;
         }
 

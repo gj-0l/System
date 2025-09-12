@@ -1,11 +1,19 @@
+<?php
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
+?>
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
     <title>إضافة معدّة</title>
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- <link rel="stylesheet" href="../public/css/style.css"> -->
 
     <style>
@@ -16,16 +24,9 @@
             font-family: 'Cairo', sans-serif;
         }
 
-        body {
-            background: linear-gradient(to right, #e0f7ec, #a8e6cf);
-            min-height: 100vh;
-            direction: rtl;
-            padding: 20px;
-        }
-
         .header {
             width: 100%;
-            background-color: #43a047;
+            background-color: #0b6f76;
             padding: 15px 25px;
             color: white;
             font-size: 18px;
@@ -55,7 +56,7 @@
 
         .title {
             text-align: center;
-            color: #2e7d32;
+            color: #1d8e96;
             font-size: 28px;
             margin-bottom: 30px;
             font-weight: bold;
@@ -87,7 +88,7 @@
         .btn {
             width: 100%;
             padding: 14px;
-            background-color: #43a047;
+            background-color: #0b6f76;
             border: none;
             border-radius: 8px;
             color: white;
@@ -98,36 +99,35 @@
         }
 
         .btn:hover {
-            background-color: #388e3c;
+            background-color: #22939b;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <div><strong>لوحة التحكم - إضافة معدّة</strong></div>
-        <div><a href="javascript:history.back()">🔙 رجوع</a></div>
-    </div>
+    <?php renderNavbar('Update Equipment'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('equipments'); ?>
 
-    <div class="container">
-        <h2 class="title">إضافة معدّة جديدة</h2>
+        <main class="p-6 ml-4 md:pl-64" dir="rtl">
+            <h2 class="title">تحديث المعدة</h2>
 
-        <form id="add-form" onsubmit="return updateEquipment(event)" style="margin-bottom: 25px;">
-            <div class="input-field">
-                <input type="text" id="equipment_name" name="equipment_name" placeholder="اسم المعدّة" required
-                    value="<?= htmlspecialchars($old['equipment_name'] ?? '') ?>" />
-            </div>
-            <div class="input-field">
-                <input type="text" id="equipment_code" name="equipment_code" placeholder="رقم المعدّة" required
-                    value="<?= htmlspecialchars($old['equipment_code'] ?? '') ?>" />
-            </div>
-            <div class="input-field">
-                <textarea id="description" name="description" placeholder="وصف (اختياري)"
-                    rows="4"><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
-            </div>
-            <button type="submit" class="btn">تعديل</button>
-        </form>
-
+            <form id="add-form" onsubmit="return updateEquipment(event)" style="margin-bottom: 25px;">
+                <div class="input-field">
+                    <input type="text" id="equipment_name" name="equipment_name" placeholder="اسم المعدّة" required
+                        value="<?= htmlspecialchars($old['equipment_name'] ?? '') ?>" />
+                </div>
+                <div class="input-field">
+                    <input type="text" id="equipment_code" name="equipment_code" placeholder="رقم المعدّة" required
+                        value="<?= htmlspecialchars($old['equipment_code'] ?? '') ?>" />
+                </div>
+                <div class="input-field">
+                    <textarea id="description" name="description" placeholder="وصف (اختياري)"
+                        rows="4"><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
+                </div>
+                <button type="submit" class="btn">تعديل</button>
+            </form>
+        </main>
     </div>
 
     <script>

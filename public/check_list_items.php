@@ -3,6 +3,9 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/ChecklistItemController.php';
 require_once __DIR__ . '/../core/Database.php';
 
+require_once __DIR__ . '/../tools/sidebar.php';
+require_once __DIR__ . '/../tools/navbar.php';
+
 session_start();
 if (empty($_SESSION['auth_token'])) {
   header("Location: " . BASE_URL . "/public/login.php");
@@ -14,20 +17,15 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
 ?>
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
   <meta charset="UTF-8">
   <title>قائمة عناصر الفحص</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to right, #f1f8e9, #c8e6c9);
-      padding: 20px;
-      direction: rtl;
-    }
-
     .container {
       max-width: 1000px;
       margin: auto;
@@ -39,7 +37,7 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
 
     h2 {
       text-align: center;
-      color: #388e3c;
+      color: #22939b;
       margin-bottom: 20px;
     }
 
@@ -57,7 +55,7 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
 
     th {
       background-color: #c8e6c9;
-      color: #2e7d32;
+      color: #1d8e96;
     }
 
     tr:hover {
@@ -107,7 +105,7 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
     a.back-link {
       display: inline-block;
       margin-bottom: 15px;
-      color: #2e7d32;
+      color: #1d8e96;
       font-weight: bold;
       text-decoration: none;
     }
@@ -119,36 +117,38 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
 </head>
 
 <body>
-  <div class="container">
-    <a href="<?= BASE_URL ?>/public/dashboard.php" class="back-link">⬅ العودة إلى لوحة التحكم</a>
-    <h2>قائمة عناصر الفحص</h2>
+  <?php renderNavbar('Check List'); ?>
+  <div class="dashboard-container min-h-screen bg-gray-50">
+    <?php renderSidebar('check_list_items'); ?>
 
-    <!-- Dropdown لاختيار المعدة -->
-    <label for="equipmentSelect">اختر المعدة:</label>
-    <select id="equipmentSelect">
-      <option value="">-- اختر --</option>
-      <?php foreach ($equipments as $eq): ?>
-        <option value="<?= $eq['id'] ?>"><?= htmlspecialchars($eq['equipment_name']) ?></option>
-      <?php endforeach; ?>
-    </select>
+    <main class="p-6 ml-4 md:pl-64" dir="rtl">
+      <!-- Dropdown لاختيار المعدة -->
+      <label for="equipmentSelect">اختر المعدة:</label>
+      <select id="equipmentSelect">
+        <option value="">-- اختر --</option>
+        <?php foreach ($equipments as $eq): ?>
+          <option value="<?= $eq['id'] ?>"><?= htmlspecialchars($eq['equipment_name']) ?></option>
+        <?php endforeach; ?>
+      </select>
 
-    <!-- جدول العناصر -->
-    <div id="itemsContainer" style="margin-top:20px; display:none;">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>نوع الفحص</th>
-            <th>الحالة الابتدائية</th>
-            <th>الإجراء الأولي</th>
-            <th>التحكم</th>
-          </tr>
-        </thead>
-        <tbody id="itemsTableBody">
-          <!-- يملأ بالـ JS -->
-        </tbody>
-      </table>
-    </div>
+      <!-- جدول العناصر -->
+      <div id="itemsContainer" style="margin-top:20px; display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>نوع الفحص</th>
+              <th>الحالة الابتدائية</th>
+              <th>الإجراء الأولي</th>
+              <th>التحكم</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <!-- يملأ بالـ JS -->
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
 
   <script>
@@ -203,7 +203,7 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d32f2f',
-        cancelButtonColor: '#388e3c',
+        cancelButtonColor: '#22939b',
         confirmButtonText: 'نعم، احذف',
         cancelButtonText: 'إلغاء'
       }).then((result) => {

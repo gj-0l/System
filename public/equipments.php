@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/EquipmentController.php';
+require_once __DIR__ . '/../tools/sidebar.php';
+require_once __DIR__ . '/../tools/navbar.php';
 
 session_start();
 if (empty($_SESSION['auth_token'])) {
@@ -9,21 +11,15 @@ if (empty($_SESSION['auth_token'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
   <meta charset="UTF-8" />
   <title>قائمة المعدات</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to right, #e0f7ec, #a8e6cf);
-      padding: 20px;
-      direction: rtl;
-      margin: 0;
-    }
-
     .container {
       max-width: 1000px;
       margin: auto;
@@ -35,7 +31,7 @@ if (empty($_SESSION['auth_token'])) {
     }
 
     h2 {
-      color: #2e7d32;
+      color: #1d8e96;
       text-align: center;
       margin-bottom: 20px;
     }
@@ -55,7 +51,7 @@ if (empty($_SESSION['auth_token'])) {
 
     th {
       background-color: #a8e6cf;
-      color: #2e7d32;
+      color: #1d8e96;
     }
 
     tr:hover {
@@ -103,7 +99,7 @@ if (empty($_SESSION['auth_token'])) {
     a.back-link {
       display: inline-block;
       margin-bottom: 15px;
-      color: #2e7d32;
+      color: #1d8e96;
       font-weight: bold;
       text-decoration: none;
     }
@@ -151,26 +147,30 @@ if (empty($_SESSION['auth_token'])) {
 </head>
 
 <body>
-  <div class="container">
-    <a href="<?= BASE_URL ?>/public/dashboard.php" class="back-link">⬅ العودة إلى لوحة التحكم</a>
-    <h2>قائمة المعدات</h2>
+  <?php renderNavbar('Equipments List'); ?>
+  <div class="dashboard-container min-h-screen bg-gray-50">
+    <?php renderSidebar('equipments'); ?>
 
-    <table id="equipmentsTable">
-      <thead>
-        <tr>
-          <th>رقم</th>
-          <th>اسم المعدة</th>
-          <th>رقم المعدة</th>
-          <th>الوصف</th>
-          <th>الإجراءات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="5">⏳ جارٍ تحميل البيانات...</td>
-        </tr>
-      </tbody>
-    </table>
+    <main class="p-6 ml-4 md:pl-64" dir="rtl">
+      <h2>قائمة المعدات</h2>
+
+      <table id="equipmentsTable">
+        <thead>
+          <tr>
+            <th>رقم</th>
+            <th>اسم المعدة</th>
+            <th>رقم المعدة</th>
+            <th>الوصف</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5">⏳ جارٍ تحميل البيانات...</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
   </div>
 
   <script>
@@ -215,7 +215,7 @@ if (empty($_SESSION['auth_token'])) {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#e53935',
-        cancelButtonColor: '#43a047',
+        cancelButtonColor: '#0b6f76',
         confirmButtonText: 'نعم، احذف',
         cancelButtonText: 'إلغاء'
       }).then(async (result) => {

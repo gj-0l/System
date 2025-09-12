@@ -1,11 +1,19 @@
+<?php
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
+?>
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8" />
     <title>إضافة معدّة</title>
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- <link rel="stylesheet" href="../public/css/style.css"> -->
 
     <style>
@@ -14,16 +22,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Cairo', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(to right, #e0f7ec, #a8e6cf);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            direction: rtl;
-            padding: 20px;
         }
 
         .container {
@@ -37,7 +35,7 @@
 
         .title {
             text-align: center;
-            color: #2e7d32;
+            color: #1d8e96;
             font-size: 28px;
             margin-bottom: 30px;
             font-weight: bold;
@@ -69,7 +67,7 @@
         .btn {
             width: 100%;
             padding: 14px;
-            background-color: #43a047;
+            background-color: #0b6f76;
             border: none;
             border-radius: 8px;
             color: white;
@@ -80,7 +78,7 @@
         }
 
         .btn:hover {
-            background-color: #388e3c;
+            background-color: #22939b;
         }
 
         p {
@@ -90,7 +88,7 @@
         }
 
         a {
-            color: #2e7d32;
+            color: #1d8e96;
             font-weight: bold;
             text-decoration: none;
         }
@@ -106,37 +104,41 @@
 </head>
 
 <body>
-    <div class="container">
-        <h2 class="title"> Singup</h2>
+    <?php renderNavbar('Update User'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('users'); ?>
 
-        <form id="equipmentForm" method="post" onsubmit="return updateUser(event)">
-            <div class="input-field">
-                <input type="text" name="name" id="name" placeholder="Name.." required />
-            </div>
-            <div class="input-field">
-                <input type="email" name="email" id="email" placeholder="Email..." required />
-            </div>
-            <div class="input-field">
-                <input type="password" name="password" id="password" placeholder="Password" />
-            </div>
-            <div class="input-field">
-                <select name="type" id="type" required>
-                    <option value="">Type Accounting</option>
-                    <option value="execution">منفذ (Execution)</option>
-                    <option value="requester">طالب (Requester)</option>
-                    <option value="admin">أدمن (Admin)</option>
-                </select>
-            </div>
-            <div class="input-field">
-                <select name="status" id="status" required>
-                    <option value="">status</option>
-                    <option value="active">active</option>
-                    <option value="inactive">inactive</option>
-                </select>
-            </div>
-            <input type="submit" class="btn" value="Update" />
-        </form>
+        <main class="p-6 ml-4 md:pl-64" dir="rtl">
+            <h2 class="title"> Singup</h2>
 
+            <form id="equipmentForm" method="post" onsubmit="return updateUser(event)">
+                <div class="input-field">
+                    <input type="text" name="name" id="name" placeholder="Name.." required />
+                </div>
+                <div class="input-field">
+                    <input type="email" name="email" id="email" placeholder="Email..." required />
+                </div>
+                <div class="input-field">
+                    <input type="password" name="password" id="password" placeholder="Password" />
+                </div>
+                <div class="input-field">
+                    <select name="type" id="type" required>
+                        <option value="">Type Accounting</option>
+                        <option value="execution">منفذ (Execution)</option>
+                        <option value="requester">طالب (Requester)</option>
+                        <option value="admin">أدمن (Admin)</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <select name="status" id="status" required>
+                        <option value="">status</option>
+                        <option value="active">active</option>
+                        <option value="inactive">inactive</option>
+                    </select>
+                </div>
+                <input type="submit" class="btn" value="Update" />
+            </form>
+        </main>
     </div>
 
     <script>
@@ -145,7 +147,7 @@
                 icon: 'error',
                 title: 'خطأ',
                 text: <?= json_encode($error) ?>,
-                confirmButtonColor: '#43a047'
+                confirmButtonColor: '#0b6f76'
             });
         <?php endif; ?>
 
@@ -153,7 +155,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'تمت الإضافة بنجاح',
-                confirmButtonColor: '#43a047'
+                confirmButtonColor: '#0b6f76'
             }).then(() => {
                 document.getElementById('equipmentForm').reset();
             });

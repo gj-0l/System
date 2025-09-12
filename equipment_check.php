@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     h2 {
       text-align: center;
-      color: #2e7d32;
+      color: #1d8e96;
       margin-bottom: 20px;
     }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     label {
       font-weight: bold;
-      color: #2e7d32;
+      color: #1d8e96;
     }
 
     select,
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     button {
-      background-color: #43a047;
+      background-color: #0b6f76;
       color: white;
       margin-top: 20px;
       cursor: pointer;
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     button:hover {
-      background-color: #388e3c;
+      background-color: #22939b;
     }
 
     table {

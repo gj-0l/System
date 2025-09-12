@@ -1,27 +1,21 @@
+<?php
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
+?>
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>إضافة فحص للمعدة</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            direction: rtl;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .form-container {
             width: 90%;
             max-width: 600px;
@@ -42,83 +36,59 @@
             box-sizing: border-box;
         }
 
-
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        select,
-        input[type="text"] {
+        .btn {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-        }
-
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 12px;
+            padding: 14px;
+            background-color: #0b6f76;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            width: 100%;
-            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
         }
 
-        @media (max-width: 480px) {
-            .form-container {
-                padding: 15px;
-            }
-
-            button {
-                font-size: 1rem;
-                padding: 10px;
-            }
+        .btn:hover {
+            background-color: #22939b;
         }
     </style>
 </head>
 
 <body>
+    <?php renderNavbar('Add Check'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('add_check_item'); ?>
 
-    <div class="form-container">
-        <h2>إضافة فحص جديد للمعدة</h2>
+        <main class="p-6 ml-4 md:pl-64" dir="rtl">
+            <h2>إضافة فحص جديد للمعدة</h2>
 
-        <form id="add-form" onsubmit="return addEquipment(event)">
-            <label>المعدة</label>
-            <select name="equipment_id" id="equipment_id" class="form-control" required>
-                <option value="">-- اختر المعدة --</option>
-                <?php foreach ($equipment as $eq): ?>
-                    <option value="<?= $eq['id'] ?>"><?= htmlspecialchars($eq['equipment_name']) ?></option>
-                <?php endforeach; ?>
-            </select>
+            <form id="add-form" onsubmit="return addEquipment(event)">
+                <label>المعدة</label>
+                <select name="equipment_id" id="equipment_id" class="form-control" required>
+                    <option value="">-- اختر المعدة --</option>
+                    <?php foreach ($equipment as $eq): ?>
+                        <option value="<?= $eq['id'] ?>"><?= htmlspecialchars($eq['equipment_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <label>نوع الفحص</label>
-            <input type="text" name="test_name" id="test_name" class="form-control" placeholder="مثلاً: فحص الزيت"
-                required />
+                <label>نوع الفحص</label>
+                <input type="text" name="test_name" id="test_name" class="form-control" placeholder="مثلاً: فحص الزيت"
+                    required />
 
-            <label>الحالة الابتدائية</label>
-            <select name="default_status" id="default_status" class="form-control" required>
-                <option value="accepted">مقبول</option>
-                <option value="rejected">مرفوض</option>
-            </select>
+                <label>الحالة الابتدائية</label>
+                <select name="default_status" id="default_status" class="form-control" required>
+                    <option value="accepted">مقبول</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
 
-            <label>الإجراء الأولي</label>
-            <input type="text" name="initial_action" id="initial_action" class="form-control"
-                placeholder="مثلاً: تغيير الزيت" />
+                <label>الإجراء الأولي</label>
+                <input type="text" name="initial_action" id="initial_action" class="form-control"
+                    placeholder="مثلاً: تغيير الزيت" />
 
-            <button type="submit">➕ إضافة</button>
-        </form>
+                <button class="btn" type="submit">➕ إضافة</button>
+            </form>
+        </main>
     </div>
 
     <script>

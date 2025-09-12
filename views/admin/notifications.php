@@ -1,6 +1,9 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/navbar.php';
+require_once __DIR__ . '/../../tools/sidebar.php';
 ?>
 
 <!DOCTYPE html>
@@ -10,13 +13,9 @@ require_once '../config/config.php';
     <meta charset="UTF-8" />
     <title>Notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1f5f9;
-        }
-
         .navbar {
             background: #0f766e;
             padding: 16px 24px;
@@ -114,19 +113,18 @@ require_once '../config/config.php';
 </head>
 
 <body>
-    <div class="navbar">
-        <div>Mobile Equipment</div>
-        <div><a href="logout.php" style="color:white; text-decoration: none;">Logout</a></div>
-    </div>
+    <?php renderNavbar('Notifications', '/public/admin.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar(); ?>
 
-    <div class="container">
-        <div class="section-title">
-            Notifications
-            <span class="notification-badge" id="notif-count">0</span>
-        </div>
-        <div id="notifications-container">
-            <!-- Notifications will be dynamically loaded here -->
-        </div>
+        <main class="p-6 ml-4 md:pl-64">
+            <div class="section-title">
+                Notifications
+                <span class="notification-badge" id="notif-count">0</span>
+            </div>
+            <div id="notifications-container">
+                <!-- Notifications will be dynamically loaded here -->
+            </div>
     </div>
 
     <script>
