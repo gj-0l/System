@@ -8,7 +8,7 @@ require_once '../config/config.php';
 
 <head>
     <meta charset="UTF-8" />
-    <title>Notifications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>Notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         body {

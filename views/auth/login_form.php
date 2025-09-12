@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>KCML</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>KCML</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -147,14 +147,14 @@
     </div>
 
     <?php if (!empty($error)): ?>
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'خطأ',
-                text: <?= json_encode($error) ?>,
-                confirmButtonColor: '#0b6f76'
-            });
-        </script>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: <?= json_encode($error) ?>,
+                    confirmButtonColor: '#0b6f76'
+                });
+            </script>
     <?php endif; ?>
 
 </body>

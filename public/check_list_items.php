@@ -21,6 +21,7 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>قائمة عناصر الفحص</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -44,17 +45,17 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: right;
     }
 
     th,
     td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #a5d6a7;
+      padding: 12px 10px;
+      border-bottom: 1px solid #c8e6c9;
+      text-align: right;
     }
 
     th {
-      background-color: #c8e6c9;
+      background-color: #a8e6cf;
       color: #1d8e96;
     }
 
@@ -113,6 +114,67 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
     a.back-link:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 768px) {
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead tr {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #c8e6c9;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      td {
+        text-align: right;
+        /* ✅ كل النصوص يمين */
+        padding: 8px 10px 8px 130px;
+        /* ✅ نترك مساحة لليبل */
+        position: relative;
+        direction: rtl;
+        /* ✅ يلتزم بالاتجاه */
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        position: absolute;
+        right: 10px;
+        /* ✅ الليبل على اليمين */
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        color: #333;
+      }
+
+      td:last-child a {
+        display: block;
+        /* ✅ كل زر بسطر */
+        width: 100%;
+        /* ✅ ياخذ عرض كامل */
+        text-align: center;
+        /* ✅ النص بالوسط */
+        margin-bottom: 6px;
+        /* ✅ مسافة بين الأزرار */
+      }
+
+      td:last-child a:last-child {
+        margin-bottom: 0;
+        /* ✅ آخر زر بلا مسافة إضافية */
+      }
+    }
   </style>
 </head>
 
@@ -132,7 +194,8 @@ $equipments = $db->query("SELECT id, equipment_name FROM equipment ORDER BY equi
       </select>
 
       <!-- جدول العناصر -->
-      <div id="itemsContainer" style="margin-top:20px; display:none;">
+      <div id="itemsContainer" class="w-full max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md"
+        style="margin-top:20px; display:none;">
         <table>
           <thead>
             <tr>

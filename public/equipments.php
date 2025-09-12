@@ -15,21 +15,12 @@ if (empty($_SESSION['auth_token'])) {
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>قائمة المعدات</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 128, 0, 0.15);
-      overflow-x: auto;
-    }
-
     h2 {
       color: #1d8e96;
       text-align: center;
@@ -39,7 +30,6 @@ if (empty($_SESSION['auth_token'])) {
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
     }
 
     th,
@@ -153,23 +143,24 @@ if (empty($_SESSION['auth_token'])) {
 
     <main class="p-6 ml-4 md:pl-64" dir="rtl">
       <h2>قائمة المعدات</h2>
-
-      <table id="equipmentsTable">
-        <thead>
-          <tr>
-            <th>رقم</th>
-            <th>اسم المعدة</th>
-            <th>رقم المعدة</th>
-            <th>الوصف</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="5">⏳ جارٍ تحميل البيانات...</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="w-full max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <table id="equipmentsTable">
+          <thead>
+            <tr>
+              <th>رقم</th>
+              <th>اسم المعدة</th>
+              <th>رقم المعدة</th>
+              <th>الوصف</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="5">⏳ جارٍ تحميل البيانات...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
   </div>
 

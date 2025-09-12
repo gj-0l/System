@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
 
 <head>
     <meta charset="UTF-8" />
-    <title>إضافة معدّة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>إضافة معدّة</title>
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>

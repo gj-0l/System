@@ -16,16 +16,6 @@ require_once __DIR__ . '/../../tools/navbar.php';
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        .form-container {
-            width: 90%;
-            max-width: 600px;
-            background: #fff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
         .form-control {
             width: 100%;
             padding: 10px;
