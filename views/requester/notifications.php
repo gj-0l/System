@@ -1,6 +1,9 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -8,35 +11,12 @@ require_once '../config/config.php';
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>Notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notifications</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1f5f9;
-        }
-
-        .navbar {
-            background: #0f766e;
-            padding: 16px 24px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
         .section-title {
             font-size: 26px;
             margin-bottom: 20px;
@@ -114,24 +94,20 @@ require_once '../config/config.php';
 </head>
 
 <body>
-    <div class="navbar">
-        <div>Mobile Equipment</div>
-        <div><a href="logout.php" style="color:white; text-decoration: none;">Logout</a></div>
-    </div>
+    <?php renderNavbar('Notifications', '/public/requester.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar(''); ?>
 
-    <div class="container">
-        <div class="section-title">
-            Notifications
-            <span class="notification-badge" id="notif-count">0</span>
-        </div>
+        <main class="p-6 ml-4 md:pl-64">
+            <div class="section-title">
+                Notifications
+                <span class="notification-badge" id="notif-count">0</span>
+            </div>
 
-        <a href="<?= BASE_URL ?>/public/requester_calendar.php" class="link">calendar</a>
-        <br>
-        <a href="<?= BASE_URL ?>/public/events.php" class="link">today requests</a>
-
-        <div id="notifications-container">
-            <!-- Notifications will be dynamically loaded here -->
-        </div>
+            <div id="notifications-container">
+                <!-- Notifications will be dynamically loaded here -->
+            </div>
+        </main>
     </div>
 
     <script>
@@ -153,7 +129,7 @@ require_once '../config/config.php';
                         const card = document.createElement('div');
                         card.className = 'notif-card';
                         card.innerHTML = `
-                        <a href="${notif.url || '#'}" class="notif-header" target="_blank">
+                        <a href="${notif.url || '#'}" class="notif-header">
                             ${notif.title || 'Notification'}
                             <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
                             <div class="notif-body">

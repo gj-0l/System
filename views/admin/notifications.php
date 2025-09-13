@@ -148,8 +148,6 @@ require_once __DIR__ . '/../../tools/sidebar.php';
                         card.className = 'notif-card';
                         card.innerHTML = `
                         <a href="${notif.url || '#'}" class="notif-header" target="_blank">
-                            ${notif.title || 'Notification'}
-                            <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
                             <div class="notif-body">
                                 ${notif.title ? `<strong>${notif.title}</strong><br>` : ''}
                                 ${notif.body}

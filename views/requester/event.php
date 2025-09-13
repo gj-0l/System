@@ -3,6 +3,9 @@ require_once '../core/Database.php';
 require_once '../config/config.php';
 require_once '../controllers/CalenderController.php';
 
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
 $token = $_GET['id'] ?? null;
 if (!$token) {
     die("Missed Token");
@@ -24,18 +27,10 @@ $status = strtolower(trim($event['status']));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        body {
-            font-family: "Segoe UI", Tahoma, sans-serif;
-            background: #f9fafb;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <style>
         .card {
             background: #fff;
             margin: 16px;
@@ -146,48 +141,55 @@ $status = strtolower(trim($event['status']));
 </head>
 
 <body>
-    <div class="card">
-        <h2>Event Details</h2>
+    <?php renderNavbar('Event details', '/public/requester.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar(''); ?>
 
-        <!-- تفاصيل الحدث -->
-        <div class="details">
-            <div class="label">Title:</div>
-            <div class="value" id="value-title"></div>
-            <div class="label">PR:</div>
-            <div class="value" id="value-pr"></div>
+        <main class="p-6 ml-4 md:pl-64">
+            <div class="card">
+                <h2>Event Details</h2>
 
-            <div class="label">Equipment:</div>
-            <div class="value" id="value-equipment"></div>
+                <!-- تفاصيل الحدث -->
+                <div class="details">
+                    <div class="label">Title:</div>
+                    <div class="value" id="value-title"></div>
+                    <div class="label">PR:</div>
+                    <div class="value" id="value-pr"></div>
 
-            <div class="label">Area:</div>
-            <div class="value" id="value-area"></div>
+                    <div class="label">Equipment:</div>
+                    <div class="value" id="value-equipment"></div>
 
-            <div class="label">Location:</div>
-            <div class="value" id="value-location"></div>
+                    <div class="label">Area:</div>
+                    <div class="value" id="value-area"></div>
 
-            <div class="label">Work Type:</div>
-            <div class="value" id="value-type"></div>
+                    <div class="label">Location:</div>
+                    <div class="value" id="value-location"></div>
 
-            <div class="label">Description:</div>
-            <div class="value" id="value-description"></div>
+                    <div class="label">Work Type:</div>
+                    <div class="value" id="value-type"></div>
 
-            <div class="label">From:</div>
-            <div class="value" id="value-from"></div>
+                    <div class="label">Description:</div>
+                    <div class="value" id="value-description"></div>
 
-            <div class="label">To:</div>
-            <div class="value" id="value-to"></div>
+                    <div class="label">From:</div>
+                    <div class="value" id="value-from"></div>
 
-            <div class="label">Created By:</div>
-            <div class="value" id="value-created-by"></div>
+                    <div class="label">To:</div>
+                    <div class="value" id="value-to"></div>
 
-            <div class="label">Status:</div>
-            <div class="value" id="status-value"></div>
+                    <div class="label">Created By:</div>
+                    <div class="value" id="value-created-by"></div>
 
-            <div class="label">Cancellation note:</div>
-            <div class="value" id="cancellation-note"></div>
-        </div>
+                    <div class="label">Status:</div>
+                    <div class="value" id="status-value"></div>
 
-        <div id="message" class="message"></div>
+                    <div class="label">Cancellation note:</div>
+                    <div class="value" id="cancellation-note"></div>
+                </div>
+
+                <div id="message" class="message"></div>
+            </div>
+        </main>
     </div>
 
     <script>

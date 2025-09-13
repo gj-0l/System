@@ -1,6 +1,9 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -8,24 +11,13 @@ require_once '../config/config.php';
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Events list</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #f1f1f1;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
         h1 {
             text-align: center;
             color: #1d8e96;
@@ -35,23 +27,22 @@ require_once '../config/config.php';
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         th,
         td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
+            padding: 12px 10px;
+            border-bottom: 1px solid #c8e6c9;
+            text-align: right;
         }
 
         th {
-            background-color: #a5d6a7;
-            color: #333;
+            background-color: #a8e6cf;
+            color: #1d8e96;
         }
 
         tr:hover {
-            background-color: #f1f8e9;
+            background-color: #f1f8f4;
         }
 
         .logout {
@@ -71,34 +62,94 @@ require_once '../config/config.php';
         .logout a:hover {
             background-color: #b71c1c;
         }
+
+        @media (max-width: 768px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead tr {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid #c8e6c9;
+                border-radius: 10px;
+                padding: 10px;
+            }
+
+            td {
+                text-align: right;
+                /* ✅ كل النصوص يمين */
+                padding: 8px 10px 8px 130px;
+                /* ✅ نترك مساحة لليبل */
+                position: relative;
+                direction: rtl;
+                /* ✅ يلتزم بالاتجاه */
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                position: absolute;
+                right: 10px;
+                /* ✅ الليبل على اليمين */
+                top: 50%;
+                transform: translateY(-50%);
+                white-space: nowrap;
+                color: #333;
+            }
+
+            td:last-child a {
+                display: block;
+                /* ✅ كل زر بسطر */
+                width: 100%;
+                /* ✅ ياخذ عرض كامل */
+                text-align: center;
+                /* ✅ النص بالوسط */
+                margin-bottom: 6px;
+                /* ✅ مسافة بين الأزرار */
+            }
+
+            td:last-child a:last-child {
+                margin-bottom: 0;
+                /* ✅ آخر زر بلا مسافة إضافية */
+            }
+        }
     </style>
 </head>
 
 <body>
+    <?php renderNavbar('Today Requests', '/public/requester.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('today_requests'); ?>
 
-    <div class="container">
-        <div class="logout">
-            <a href="<?= BASE_URL ?>/public/logout.php">Logout</a>
-        </div>
+        <main class="p-6 ml-4 md:pl-64">
+            <h3 style="text-align:center;">Today Events List</h3>
 
-        <h3 style="text-align:center;">Today Events List</h3>
-
-        <table id="eventsTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>title</th>
-                    <th>Status</th>
-                    <th>Requester</th>
-                    <th>Start date</th>
-                    <th>End date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="eventsTableBody">
-                <!-- سيتم ملؤه عبر JavaScript -->
-            </tbody>
-        </table>
+            <table id="eventsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>title</th>
+                        <th>Status</th>
+                        <th>Requester</th>
+                        <th>Start date</th>
+                        <th>End date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="eventsTableBody">
+                    <!-- سيتم ملؤه عبر JavaScript -->
+                </tbody>
+            </table>
     </div>
 
     <script>
@@ -126,7 +177,7 @@ require_once '../config/config.php';
                     }
 
                     if (events.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7">لا توجد أحداث</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="7">No Events</td></tr>';
                         return;
                     }
 

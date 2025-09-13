@@ -1,11 +1,20 @@
 <?php
+require_once __DIR__ . '/../tools/sidebar.php';
+require_once __DIR__ . '/../tools/navbar.php';
+
 require_once __DIR__ . '/../config/config.php';
+
+session_start();
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>فحص المعدات</title>
 
     <!-- تعريف BASE_URL للاستخدام داخل JavaScript -->
@@ -25,30 +34,35 @@ require_once __DIR__ . '/../config/config.php';
 </head>
 
 <body>
-    <div class="container">
-        <h2>فحص المعدات اليومية</h2>
-        <div id="message" class="message" style="display: none;"></div>
+    <?php renderNavbar('All Asset Type', '/public/executer.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('all_asset_types'); ?>
 
-        <label for="equipmentSelect">اختر المعدة:</label>
-        <select id="equipmentSelect">
-            <option value="">-- اختر --</option>
-        </select>
+        <main class="p-6 ml-4 md:pl-64" dir="rtl">
+            <h2>فحص المعدات اليومية</h2>
+            <div id="message" class="message" style="display: none;"></div>
 
-        <form id="checklistForm" style="display:none;">
-            <table id="checklistTable">
-                <thead>
-                    <tr>
-                        <th>اسم الفحص</th>
-                        <th>الإجراء الابتدائي</th>
-                        <th>الحالة</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <button type="submit">💾 حفظ النتائج</button>
-        </form>
+            <label for="equipmentSelect">اختر المعدة:</label>
+            <select id="equipmentSelect" class="select">
+                <option value="">-- اختر --</option>
+            </select>
 
-        <p id="noChecklist" style="display:none;">❌ لا توجد فحوصات مضافة لهذه المعدة بعد.</p>
+            <form id="checklistForm" style="display:none;">
+                <table id="checklistTable">
+                    <thead>
+                        <tr>
+                            <th>اسم الفحص</th>
+                            <th>الإجراء الابتدائي</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="submit" class="btn">💾 حفظ النتائج</button>
+            </form>
+
+            <p id="noChecklist" style="display:none;">❌ لا توجد فحوصات مضافة لهذه المعدة بعد.</p>
+        </main>
     </div>
 </body>
 

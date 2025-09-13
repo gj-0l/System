@@ -2,39 +2,77 @@
 // sidebar.php
 function renderSidebar($activePage = '')
 {
+    //get user role
+    $userRole = $_SESSION['user_type'];
 
-    $links = [
-        'dashboard' => [
-            'label' => 'Dashboard',
-            'href' => BASE_URL . '/public/dashboard.php',
-            'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
-        ],
-        'add_equipment' => [
-            'label' => 'Add Equipment',
-            'href' => BASE_URL . '/public/add_equipment.php',
-            'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
-        ],
-        'equipments' => [
-            'label' => 'Equipments List',
-            'href' => BASE_URL . '/public/equipments.php',
-            'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
-        ],
-        'users' => [
-            'label' => 'Users List',
-            'href' => BASE_URL . '/public/users.php',
-            'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
-        ],
-        'add_check_item' => [
-            'label' => 'Add Check',
-            'href' => BASE_URL . '/public/add_check_item.php',
-            'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
-        ],
-        'check_list_items' => [
-            'label' => 'Check List',
-            'href' => BASE_URL . '/public/check_list_items.php',
-            'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
-        ],
-    ];
+    switch ($userRole) {
+        case 'admin':
+            $links = [
+                'dashboard' => [
+                    'label' => 'Dashboard',
+                    'href' => BASE_URL . '/public/dashboard.php',
+                    'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
+                ],
+                'add_equipment' => [
+                    'label' => 'Add Equipment',
+                    'href' => BASE_URL . '/public/add_equipment.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+                'equipments' => [
+                    'label' => 'Equipments List',
+                    'href' => BASE_URL . '/public/equipments.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+                'users' => [
+                    'label' => 'Users List',
+                    'href' => BASE_URL . '/public/users.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+                'add_check_item' => [
+                    'label' => 'Add Check',
+                    'href' => BASE_URL . '/public/add_check_item.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+                'check_list_items' => [
+                    'label' => 'Check List',
+                    'href' => BASE_URL . '/public/check_list_items.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+            ];
+            break;
+        case 'execution':
+            $links = [
+                'dashboard' => [
+                    'label' => 'Dashboard',
+                    'href' => BASE_URL . '/public/executer_dashboard.php',
+                    'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
+                ],
+                'all_asset_types' => [
+                    'label' => 'All Asset Types',
+                    'href' => BASE_URL . '/public/checklist.php',
+                    'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
+                ],
+
+            ];
+            break;
+        case 'requester':
+            $links = [
+                'calendar' => [
+                    'label' => 'Calendar',
+                    'href' => BASE_URL . '/public/requester_calendar.php',
+                    'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
+                ],
+                'today_requests' => [
+                    'label' => 'Today Requests',
+                    'href' => BASE_URL . '/public/events.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
+            ];
+            break;
+        default:
+            $links = [];
+            break;
+    }
     ?>
 
     <!-- Overlay للموبايل -->

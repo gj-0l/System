@@ -2,6 +2,9 @@
 require_once '../core/Database.php';
 require_once '../config/config.php';
 
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -9,16 +12,12 @@ require_once '../config/config.php';
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Show Equipments</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #f1f1f1;
-            padding: 20px;
-            direction: ltr;
-        }
-
         .container {
             max-width: 900px;
             margin: auto;
@@ -77,27 +76,25 @@ require_once '../config/config.php';
 </head>
 
 <body>
+    <?php renderNavbar('Dashboard', '/public/executer.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('dashboard'); ?>
 
-    <div class="container">
-        <div class="logout">
-            <a href="<?= BASE_URL ?>/public/logout.php">Logout</a>
-        </div>
+        <main class="p-6 ml-4 md:pl-64">
+            <h3 style="text-align:center;">Equipment List</h3>
 
-        <h1>Welcome <?= $_SESSION['user_name'] ?> 👋</h1>
-        <h3 style="text-align:center;">Equipment List</h3>
-
-        <table id="equipmentsTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Equipment Name</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="equipmentsTableBody">
-                <!-- سيتم ملؤه عبر JavaScript -->
-            </tbody>
-        </table>
+            <table id="equipmentsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Equipment Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="equipmentsTableBody">
+                    <!-- سيتم ملؤه عبر JavaScript -->
+                </tbody>
+            </table>
     </div>
 
     <script>

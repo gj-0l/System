@@ -49,10 +49,10 @@ class AuthController
                 // إعادة التوجيه حسب النوع
                 switch ($user['type']) {
                     case 'execution':
-                        header("Location: " . BASE_URL . "/public/executer.php");
+                        header("Location: " . BASE_URL . "/public/executer_dashboard.php");
                         break;
                     case 'requester':
-                        header("Location: " . BASE_URL . "/public/requester.php");
+                        header("Location: " . BASE_URL . "/public/requester_calendar.php");
                         break;
                     case 'admin':
                         header("Location: " . BASE_URL . "/public/dashboard.php");

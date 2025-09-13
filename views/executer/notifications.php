@@ -1,6 +1,9 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -8,15 +11,12 @@ require_once '../config/config.php';
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>Notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notifications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f1f5f9;
-        }
-
         .navbar {
             background: #0f766e;
             padding: 16px 24px;
@@ -114,24 +114,19 @@ require_once '../config/config.php';
 </head>
 
 <body>
-    <div class="navbar">
-        <div>Mobile Equipment</div>
-        <div><a href="logout.php" style="color:white; text-decoration: none;">Logout</a></div>
-    </div>
+    <?php renderNavbar('Check List'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('check_list_items'); ?>
 
-    <div class="container">
-        <div class="section-title">
-            Notifications
-            <span class="notification-badge" id="notif-count">0</span>
-        </div>
+        <main class="p-6 ml-4 md:pl-64">
+            <div class="section-title">
+                Notifications
+                <span class="notification-badge" id="notif-count">0</span>
+            </div>
 
-        <a href="<?= BASE_URL ?>/public/checklist.php" class="link">All Asset Types</a>
-        <br>
-        <a href="<?= BASE_URL ?>/public/executer_dashboard.php" class="link">Dashboard</a>
-
-        <div id="notifications-container">
-            <!-- Notifications will be dynamically loaded here -->
-        </div>
+            <div id="notifications-container">
+                <!-- Notifications will be dynamically loaded here -->
+            </div>
     </div>
 
     <script>
@@ -153,7 +148,7 @@ require_once '../config/config.php';
                         const card = document.createElement('div');
                         card.className = 'notif-card';
                         card.innerHTML = `
-                        <a href="${notif.url || '#'}" class="notif-header" target="_blank">
+                        <a href="${notif.url || '#'}" class="notif-header">
                             <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
                             <div class="notif-body">
                                 ${notif.title ? `<strong>${notif.title}</strong><br>` : ''}

@@ -1,6 +1,10 @@
 <?php
 require_once '../core/Database.php';
 require_once '../config/config.php';
+
+require_once __DIR__ . '/../../tools/sidebar.php';
+require_once __DIR__ . '/../../tools/navbar.php';
+
 session_start()
     ?>
 
@@ -9,7 +13,8 @@ session_start()
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>Calendar with Event Modal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calendar with Event Modal</title>
 
     <!-- Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -17,25 +22,11 @@ session_start()
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- Styles -->
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-
-        .navbar {
-            background: #0f766e;
-            padding: 16px 24px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
         #calendar {
             max-width: 1000px;
             margin: 0 auto;
@@ -111,14 +102,6 @@ session_start()
             background: #0f766e;
         }
 
-        a {
-            color: white;
-            text-decoration: none;
-            margin-left: 10px;
-            background-color: #14b8a6;
-            padding: 6px 12px;
-        }
-
         /* الـ Calendar */
         .calendar-wrapper {
             flex: 1;
@@ -171,21 +154,15 @@ session_start()
 </head>
 
 <body>
-    <div class="navbar">
-        <div>
-            <span>Mobile Equipment - <?= $_SESSION['user_name'] ?></span>
-            <span>-</span>
-            <a href="events.php">All event</a>
-        </div>
-        <div>
-            <button id="btnAddEvent" class="btn-add-event">Add Event</button>
-            <a href="logout.php" style="color:white; text-decoration:none; margin-left:10px;">Logout</a>
-        </div>
-    </div>
+    <?php renderNavbar('Calendar', '/public/requester.php'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('calendar'); ?>
 
-    <div class="page-wrapper">
-        <main class="calendar-wrapper">
-            <div id="calendar"></div>
+        <main class="p-6 ml-4 md:pl-64">
+            <main class="calendar-wrapper">
+                <button class="btn-add-event" style="margin-bottom: 12px;" id="btnAddEvent">Add Event</button>
+                <div id="calendar"></div>
+            </main>
         </main>
     </div>
 

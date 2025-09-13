@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../tools/sidebar.php';
+require_once __DIR__ . '/../tools/navbar.php';
+
 session_start();
 $pdo = new PDO("mysql:host=localhost;dbname=user_system", "root", "");
 
@@ -19,17 +22,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<form method="post">
-    <label>اختر المعدة:</label>
-    <select name="equipment_id" required onchange="this.form.submit()">
-        <option value="">اختر</option>
-        <?php foreach ($equipments as $eq): ?>
-            <option value="<?= $eq['id'] ?>" <?= (isset($_POST['equipment_id']) && $_POST['equipment_id'] == $eq['id']) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($eq['name']) ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</form>
+<body>
+    <?php renderNavbar('Dashboard'); ?>
+    <div class="dashboard-container min-h-screen bg-gray-50">
+        <?php renderSidebar('dashboard'); ?>
+
+        <main class="p-6 ml-4 md:pl-64">
+            <form method="post">
+                <label>اختر المعدة:</label>
+                <select name="equipment_id" required onchange="this.form.submit()">
+                    <option value="">اختر</option>
+                    <?php foreach ($equipments as $eq): ?>
+                        <option value="<?= $eq['id'] ?>" <?= (isset($_POST['equipment_id']) && $_POST['equipment_id'] == $eq['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($eq['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+        </main>
+    </div>
+</body>
 
 <?php if (isset($_POST['equipment_id'])):
     $equipment_id = $_POST['equipment_id'];

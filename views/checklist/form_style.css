@@ -1,34 +1,18 @@
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #e8f5e9;
-    direction: rtl;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 128, 0, 0.1);
-}
-
-h2 {
-    text-align: center;
-    color: #1d8e96;
-    margin-bottom: 20px;
-}
-
-.message {
-    background-color: #d0f0d0;
-    color: #1b5e20;
-    padding: 12px;
+.btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #0b6f76;
+    border: none;
     border-radius: 8px;
-    margin-bottom: 20px;
+    color: white;
+    font-size: 18px;
     font-weight: bold;
-    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #22939b;
 }
 
 label {
@@ -36,8 +20,7 @@ label {
     color: #1d8e96;
 }
 
-select,
-button {
+.select {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
