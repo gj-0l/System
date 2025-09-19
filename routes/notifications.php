@@ -33,4 +33,23 @@ if ($action === 'get_notifications' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
+// mark notification as opened
+if ($action === 'mark_as_opened' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $notification_id = $input['notification_id'];
+
+    if (!empty($notification_id)) {
+        $result = NotificationController::markAsOpened($notification_id);
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to mark as opened']);
+        }
+        exit;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid notification ID']);
+        exit;
+    }
+}
+
 // echo json_encode(['success' => false, 'message' => 'Invalid request']);

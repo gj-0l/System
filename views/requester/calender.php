@@ -14,7 +14,7 @@ session_start()
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Calendar with Event Modal</title>
+    <title>Requester</title>
 
     <!-- Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -51,6 +51,7 @@ session_start()
             font-size: 14px !important;
             padding: 0 10px !important;
             margin: 1em auto;
+            border: 1px solid #d1d5db !important;
         }
 
         /* الصفحة */
@@ -160,7 +161,7 @@ session_start()
 
         <main class="p-6 ml-4 md:pl-64">
             <main class="calendar-wrapper">
-                <button class="btn-add-event" style="margin-bottom: 12px;" id="btnAddEvent">Add Event</button>
+                <button class="btn-add-event" style="margin-bottom: 12px;" id="btnAddEvent">Add Request</button>
                 <div id="calendar"></div>
             </main>
         </main>
@@ -233,7 +234,7 @@ session_start()
                     time.style.color = "#111827"; // غامق شوي
 
                     const title = document.createElement("span");
-                    title.textContent = `- ${arg.event.title}` || "(بدون عنوان)";
+                    title.textContent = `- ${arg.event.extendedProps.equipment_name}` || "(بدون عنوان)";
                     title.style.fontSize = "13px";
                     title.style.fontWeight = "500";
                     title.style.color = "#1f2937";
@@ -310,11 +311,11 @@ session_start()
                     : '<option value="">-- No types available --</option>';
 
                 const { value: form } = await Swal.fire({
-                    title: `Add New Event`,
+                    title: `Add New Request`,
                     html: `
                     <div style="display:flex;flex-direction:column;gap:10px;text-align:left;">
                         <input id="ev-title" class="swal2-input" placeholder="Event title">
-                        <label>PR: ${createToken()}</label>
+                        <label>Wo: ${createToken()}</label>
                         <select id="ev-type" class="swal2-input">${typeOptionsHtml}</select>
                         <input id="ev-start" class="swal2-input" placeholder="Start time">
                         <input id="ev-end" class="swal2-input" placeholder="End time">
@@ -389,7 +390,7 @@ session_start()
                         Swal.fire('Error', json.message || 'Add failed', 'error');
                     }
                 } catch (e) {
-                    console.error('add event error', e);
+                    console.error('add request error', e);
                     Swal.fire('Error', 'Server error while adding event', 'error');
                 }
             };
@@ -401,7 +402,7 @@ session_start()
                 const html = `
                     <div style="text-align:left; line-height:1.4;">
                         <strong>Title:</strong> ${escapeHtml(info.event.title)}<br/>
-                        <strong>PR:</strong> ${props.token}<br/>
+                        <strong>Wo:</strong> ${props.token}<br/>
                         <strong>Created by:</strong> ${escapeHtml(props.created_by_name || '')}<br/>
                         <strong>Area:</strong> ${escapeHtml(props.area || '')}<br/>
                         <strong>Location:</strong> ${escapeHtml(props.location || '')}<br/>
@@ -453,7 +454,7 @@ session_start()
                 }
             });
 
-            /** ------------------- External Add Event Button ------------------- **/
+            /** ------------------- External Add Request Button ------------------- **/
             document.getElementById('btnAddEvent').addEventListener('click', () => handleAddEvent());
         });
     </script>

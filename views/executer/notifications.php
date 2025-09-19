@@ -92,6 +92,39 @@ require_once __DIR__ . '/../../tools/navbar.php';
             margin-left: 5px;
         }
 
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .notif-left {
+            flex-shrink: 0;
+        }
+
+        .notif-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+
+        .notif-right {
+            flex: 1;
+        }
+
+        .notif-body {
+            margin-bottom: 6px;
+        }
+
+        .notif-time {
+            font-size: 0.8em;
+            color: #999;
+        }
+
         .link {
             text-decoration: underline;
             color: #0f766e;
@@ -146,20 +179,53 @@ require_once __DIR__ . '/../../tools/navbar.php';
 
                     notifications.forEach(notif => {
                         const card = document.createElement('div');
-                        card.className = 'notif-card';
+                        card.className = `notif-card ${notif.is_opened == 1 ? 'opened' : ''}`;
                         card.innerHTML = `
-                        <a href="${notif.url || '#'}" class="notif-header">
-                            <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
-                            <div class="notif-body">
-                                ${notif.title ? `<strong>${notif.title}</strong><br>` : ''}
-                                ${notif.body}
-                                ${notif.is_opened == 0 ? '<span class="notif-dot"></span>' : ''}
+                        <div class="notif-item" data-id="${notif.id}" data-url="${notif.url || '#'}">
+                            <div class="notif-left">
+                                <img src="${notif.image || '../assets/images/logo.png'}" width="40" height="40"
+                                     alt="icon" class="notif-img">
                             </div>
-                            <div class="notif-time">${new Date(notif.created_at).toLocaleString()}</div>
-                        </a>
-            `;
+                            <div class="notif-right">
+                                <div class="notif-header">From: ${notif.sender_name || 'System'}</div>
+                                <div class="notif-body">
+                                    ${notif.title ? `<strong>${notif.title}</strong><br>` : ''}
+                                    ${notif.body || ''}
+                                    ${notif.is_opened == 0 ? '<span class="notif-dot"></span>' : ''}
+                                </div>
+                                <div class="notif-time">${new Date(notif.created_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
                         container.appendChild(card);
                     });
+
+                    // إضافة حدث الضغط
+                    document.querySelectorAll('.notif-item').forEach(item => {
+                        item.addEventListener('click', function () {
+                            const notification_id = this.getAttribute('data-id');
+                            const targetUrl = this.getAttribute('data-url');
+
+                            fetch('../routes/notifications.php?action=mark_as_opened', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ notification_id: notification_id })
+                            })
+                                .then(res => res.json())
+                                .then(result => {
+                                    if (result.success) {
+                                        this.classList.add('opened'); // ميز الإشعار كمفتوح
+                                        this.querySelector('.notif-dot')?.remove(); // شيل النقطة إذا موجودة
+                                    }
+                                    window.location.href = targetUrl;
+                                })
+                                .catch(err => {
+                                    console.error('Error marking as opened:', err);
+                                    window.location.href = targetUrl;
+                                });
+                        });
+                    });
+
                 } else {
                     alert(data.message || 'Unable to load notifications.');
                 }
@@ -168,6 +234,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 console.error('Fetch error:', error);
             });
     </script>
+
 </body>
 
 </html>

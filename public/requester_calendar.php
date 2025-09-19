@@ -6,7 +6,8 @@ require_once __DIR__ . '/../config/config.php';
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>Requester Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Requester</title>
 
     <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/index.global.min.css" rel="stylesheet" />

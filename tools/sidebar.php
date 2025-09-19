@@ -48,7 +48,7 @@ function renderSidebar($activePage = '')
                     'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
                 ],
                 'all_asset_types' => [
-                    'label' => 'All Asset Types',
+                    'label' => 'All Mobile equpment',
                     'href' => BASE_URL . '/public/checklist.php',
                     'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
                 ],
@@ -58,7 +58,7 @@ function renderSidebar($activePage = '')
         case 'requester':
             $links = [
                 'calendar' => [
-                    'label' => 'Calendar',
+                    'label' => 'Requester',
                     'href' => BASE_URL . '/public/requester_calendar.php',
                     'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
                 ],

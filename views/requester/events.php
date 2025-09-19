@@ -140,6 +140,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                         <th>#</th>
                         <th>title</th>
                         <th>Status</th>
+                        <th>Equipment</th>
                         <th>Requester</th>
                         <th>Start date</th>
                         <th>End date</th>
@@ -187,6 +188,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                             <td>${index + 1}</td>
                             <td>${event.title || '-'}</td>
                             <td>${event.status || '-'}</td>
+                            <td>${event.extendedProps.equipment_name || '-'}</td>
                             <td>${event.extendedProps.created_by_name || '-'}</td>
                             <td>${event.executer_start || '-'}</td>
                             <td>${event.end || '-'}</td>

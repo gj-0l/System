@@ -61,49 +61,15 @@ class NotificationController
         return ['success' => true];
     }
 
-
-    // Helper to send push notification
-    // private static function sendToFirebase($tokens, $title, $body, $url = '')
-    // {
-    //     $serverKey = FIREBASE_SERVER_KEY; // Put this in your config.php
-
-    //     $payload = [
-    //         'registration_ids' => $tokens,
-    //         'notification' => [
-    //             'title' => $title,
-    //             'body' => $body,
-    //             'click_action' => $url,
-    //         ],
-    //         'data' => [
-    //             'url' => $url
-    //         ]
-    //     ];
-
-    //     $headers = [
-    //         'Authorization: key=' . $serverKey,
-    //         'Content-Type: application/json',
-    //     ];
-
-    //     $ch = curl_init();
-
-    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-    //     curl_setopt($ch, CURLOPT_POST, true);
-    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-
-    //     $result = curl_exec($ch);
-    //     curl_close($ch);
-
-    //     return $result;
-    // }
-
     // Optional: mark as opened
-    public static function markAsOpened($notification_id, $user_id)
+    public static function markAsOpened($notification_id)
     {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("UPDATE notifications SET is_opened = 1 WHERE id = ? AND user_id = ?");
-        $stmt->execute([$notification_id, $user_id]);
+        $stmt = $db->prepare("UPDATE notifications SET is_opened = 1 WHERE id = ?");
+        $stmt->execute([$notification_id]);
+
+        // return success response
+        return true;
     }
 
     // Optional: get user notifications
@@ -118,6 +84,8 @@ class NotificationController
 
         if ($is_opened) {
             $query .= " AND n.is_opened = 1";
+        } else {
+            $query .= " AND n.is_opened = 0";
         }
 
         $query .= " ORDER BY n.created_at DESC";
