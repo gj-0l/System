@@ -37,5 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
+// update the resault status if the request method is PUT
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = intval($input['id'] ?? 0);
+    $status = trim($input['status'] ?? '');
+
+    $result = EquipmentController::updateResault($id, $status);
+    respond($result);
+
+}
+
 // الطلب غير مدعوم
 respond(['success' => false, 'message' => 'طريقة الطلب غير مدعومة']);

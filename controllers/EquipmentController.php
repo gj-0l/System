@@ -47,8 +47,9 @@ class EquipmentController
         try {
             $sql = "
                 SELECT 
-                e.*, 
-                COALESCE(MAX(cr.status), 'in process') AS status
+                    e.*, 
+                    COALESCE(MAX(cr.status), 'accepted') AS status,
+                    MAX(cr.id) AS checklist_result_id
                 FROM equipment e
                 LEFT JOIN checklist_items ci 
                     ON ci.equipment_id = e.id
@@ -59,6 +60,7 @@ class EquipmentController
                 ORDER BY e.id ASC
             ";
 
+
             $stmt = $db->prepare($sql);
             $stmt->execute([$date]);
             $equipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -68,6 +70,34 @@ class EquipmentController
             return [
                 'success' => false,
                 'message' => 'خطأ أثناء جلب المعدات: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public static function updateResault($id, $status)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        if (empty($status)) {
+            return [
+                'success' => false,
+                'message' => 'الحالة لا يمكن أن تكون فارغة'
+            ];
+        }
+
+        try {
+            $stmt = $db->prepare("UPDATE checklist_results SET status = ? WHERE id = ?");
+            $stmt->execute([$status, $id]);
+
+
+            return [
+                'success' => true,
+                'message' => 'تم تحديث الحالة بنجاح'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => 'حدث خطأ أثناء التحديث: ' . $e->getMessage()
             ];
         }
     }

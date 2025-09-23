@@ -150,7 +150,7 @@ require_once __DIR__ . '/../../tools/sidebar.php';
 <body>
     <?php renderNavbar('Notifications', '/public/admin.php'); ?>
     <div class="dashboard-container min-h-screen bg-gray-50">
-        <?php renderSidebar(); ?>
+        <?php renderSidebar('notifications'); ?>
 
         <main class="p-6 ml-4 md:pl-64">
             <div class="section-title">

@@ -99,34 +99,87 @@ require_once __DIR__ . '/../../tools/navbar.php';
 
     <script>
         // ✅ جلب المعدات كلها مع الحالة من checklist_results
-        fetch('../routes/executer.php',
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+        fetch('../routes/executer.php', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-        )
+        })
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('equipmentsTableBody');
                 tbody.innerHTML = '';
 
-                // إذا ما فيه بيانات
                 if (!Array.isArray(data) || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="3">لا يوجد بيانات</td></tr>';
                     return;
                 }
 
-                // ملأ الجدول بالبيانات
                 data.forEach((eq, index) => {
                     const row = document.createElement('tr');
+
+                    // ✅ إذا كانت الحالة "rejected" نخليها قابلة للضغط
+                    let statusCell = '';
+                    if (eq.status === 'rejected') {
+                        statusCell = `
+                        <button class="status-btn" 
+                                data-id="${eq.checklist_result_id}" 
+                                data-status="accepted"
+                                style="color:#d32f2f; font-weight:bold; cursor:pointer; background:none; border:none;">
+                            ${eq.status}
+                        </button>`;
+                    } else {
+                        statusCell = eq.status || '-';
+                    }
+
                     row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${eq.equipment_name}</td>
-                <td>${eq.status || '-'}</td>
-            `;
+                    <td>${index + 1}</td>
+                    <td>${eq.equipment_name}</td>
+                    <td>${statusCell}</td>
+                `;
                     tbody.appendChild(row);
+                });
+
+                // ✅ إضافة الأحداث على الأزرار بعد رسم الجدول
+                document.querySelectorAll('.status-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const checklistId = this.getAttribute('data-id');
+                        const newStatus = this.getAttribute('data-status');
+
+                        Swal.fire({
+                            title: "Do you want to change status to Accepted?",
+                            text: "The status will be updated to Accepted",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Confirm",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch('../routes/executer.php', {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        id: checklistId,
+                                        status: newStatus
+                                    })
+                                })
+                                    .then(res => res.json())
+                                    .then(result => {
+                                        if (result.success) {
+                                            Swal.fire("تم التحديث", result.message || "تم قبول الحالة", "success")
+                                                .then(() => location.reload());
+                                        } else {
+                                            Swal.fire("خطأ", result.message || "فشل في تحديث الحالة", "error");
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        Swal.fire("خطأ", "فشل الاتصال بالخادم", "error");
+                                    });
+                            }
+                        });
+                    });
                 });
             })
             .catch(error => {
@@ -134,8 +187,8 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 document.getElementById('equipmentsTableBody').innerHTML =
                     '<tr><td colspan="3">فشل في الاتصال بالخادم</td></tr>';
             });
-
     </script>
+
 
 </body>
 
