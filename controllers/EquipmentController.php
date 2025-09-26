@@ -47,17 +47,16 @@ class EquipmentController
         try {
             $sql = "
                 SELECT 
-                    e.*, 
-                    COALESCE(MAX(cr.status), 'accepted') AS status,
-                    MAX(cr.id) AS checklist_result_id
+                    e.*,
+                    cr.status,
+                    cr.id AS checklist_result_id,
+                    ci.id AS checklist_item_id
                 FROM equipment e
-                LEFT JOIN checklist_items ci 
-                    ON ci.equipment_id = e.id
-                LEFT JOIN checklist_results cr 
-                    ON cr.checklist_id = ci.id 
-                    AND DATE(cr.date) = ?
-                GROUP BY e.id
-                ORDER BY e.id ASC
+                INNER JOIN checklist_items ci ON ci.equipment_id = e.id
+                INNER JOIN checklist_results cr ON cr.checklist_id = ci.id
+                WHERE DATE(cr.date) = ?
+                ORDER BY e.id ASC, cr.id DESC;
+
             ";
 
 
