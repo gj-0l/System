@@ -1,3 +1,4 @@
 config/config.php
 core/Database.php
 "config/firebase-service-account.json" 
+vendor/

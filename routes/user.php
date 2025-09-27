@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/NotificationController.php';
+require_once __DIR__ . '/../controllers/EmailController.php';
 
 
 header('Content-Type: application/json');
@@ -38,6 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_id'] ?? null,
                     'admin',
                 );
+
+                EmailController::sendEmail(
+                    "New join request",
+                    "New join requested by: {$name}, see the details via " . BASE_URL . '/public/update_user.php?id=' . $res['data']['id'],
+                    [],
+                    "admin"
+                );
+
+
                 respond($res);
                 // }
             } else {
