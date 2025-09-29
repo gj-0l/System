@@ -4,6 +4,7 @@ require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../controllers/ChecklistController.php';
 require_once __DIR__ . '/../controllers/CalenderController.php';
 require_once __DIR__ . '/../controllers/NotificationController.php';
+require_once __DIR__ . '/../controllers/EmailController.php';
 
 header('Content-Type: application/json; charset=utf-8');
 session_start();
@@ -70,6 +71,13 @@ if ($method === 'POST') {
                     $_SESSION['user_id'] ?? null,
                     'execution',
                 );
+
+                EmailController::sendEmail(
+                    "PR: {$input['token']}",
+                    "Location: {$input['location']}, see the details via " . BASE_URL . '/public/event.php?id=' . $input['token'],
+                    [],
+                    "execution"
+                );
             }
             break;
 
@@ -103,6 +111,13 @@ if ($method === 'POST') {
                     BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
                     'requester',
+                );
+
+                EmailController::sendEmail(
+                    "executer started",
+                    "executer started working on your request {$res['token']}, see the details via " . BASE_URL . '/public/event_details.php?id=' . $res['token'],
+                    [],
+                    "requester"
                 );
             }
             break;
@@ -144,6 +159,13 @@ if ($method === 'POST') {
                     BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
                     'requester',
+                );
+
+                EmailController::sendEmail(
+                    "request cancelled",
+                    "executer cancelled your request {$res['token']}, see the details via " . BASE_URL . '/public/event_details.php?id=' . $res['token'],
+                    [],
+                    "requester"
                 );
             }
             break;
