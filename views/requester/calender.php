@@ -223,7 +223,10 @@ session_start()
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: "timeGridDay",
                 headerToolbar: { start: null, center: "title", end: null },
-                selectable: true,
+                selectable: false, // ❌ يمنع الإضافة عن طريق تحديد وقت بالكالندر
+                allDaySlot: false, // نخلي فقط الساعات
+                slotMinTime: "08:00:00", // ✅ البداية من الساعة 8 صباحاً
+                slotMaxTime: "24:00:00", // ✅ لحد 12 بالليل
 
                 eventContent: function (arg) {
                     const time = document.createElement("span");
@@ -231,7 +234,7 @@ session_start()
                     time.style.fontSize = "13px";
                     time.style.fontWeight = "600";
                     time.style.marginRight = "6px";
-                    time.style.color = "#111827"; // غامق شوي
+                    time.style.color = "#111827";
 
                     const title = document.createElement("span");
                     title.textContent = `- ${arg.event.extendedProps.equipment_name}` || "(بدون عنوان)";
@@ -250,6 +253,7 @@ session_start()
 
                     return { domNodes: [wrapper] };
                 },
+
 
 
                 eventDidMount: function (info) {
@@ -326,9 +330,29 @@ session_start()
                     </div>
         `,
                     didOpen: () => {
-                        flatpickr('#ev-start', { noCalendar: true, enableTime: true, dateFormat: "H:i", defaultDate: startTime });
-                        flatpickr('#ev-end', { noCalendar: true, enableTime: true, dateFormat: "H:i", defaultDate: endTime });
+                        const now = new Date();
+                        const minTime = "08:00";
+                        const maxTime = "23:59";
+
+                        flatpickr('#ev-start', {
+                            noCalendar: true,
+                            enableTime: true,
+                            dateFormat: "H:i",
+                            defaultDate: startTime,
+                            minTime: minTime,
+                            maxTime: maxTime
+                        });
+
+                        flatpickr('#ev-end', {
+                            noCalendar: true,
+                            enableTime: true,
+                            dateFormat: "H:i",
+                            defaultDate: endTime,
+                            minTime: minTime,
+                            maxTime: maxTime
+                        });
                     },
+
                     focusConfirm: false,
                     showCancelButton: true,
                     confirmButtonText: 'Add',
@@ -348,6 +372,23 @@ session_start()
                             Swal.showValidationMessage('Title and Start time are required.');
                             return false;
                         }
+
+                        // 🔒 منع اختيار وقت فائت
+                        const now = new Date();
+                        const [hour, minute] = startTime.split(':').map(Number);
+                        const currentHour = now.getHours();
+                        const currentMinute = now.getMinutes();
+
+                        if (hour < 8 || hour > 23 || (hour === 23 && minute > 59)) {
+                            Swal.showValidationMessage('Time must be between 08:00 and 23:59.');
+                            return false;
+                        }
+
+                        if (hour < currentHour || (hour === currentHour && minute < currentMinute)) {
+                            Swal.showValidationMessage('Cannot select a past time.');
+                            return false;
+                        }
+
 
                         const today = new Date().toISOString().split('T')[0];
                         const start = `${today} ${startTime}:00`;
