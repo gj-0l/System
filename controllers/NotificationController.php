@@ -73,27 +73,38 @@ class NotificationController
     }
 
     // Optional: get user notifications
-    public static function getUserNotifications($user_id, $is_opened = false)
+    public static function getUserNotifications($user_id, $is_opened = false, $day = null)
     {
         $db = Database::getInstance()->getConnection();
+
+        // ✅ استخدم التوقيت المحلي (العراق)
+        date_default_timezone_set('Asia/Baghdad');
+
+        // ✅ إذا ما تم تمرير يوم، استخدم اليوم الحالي
+        if ($day === null) {
+            $day = date('Y-m-d');
+        }
 
         $query = "SELECT n.*, u.name AS sender_name
               FROM notifications n
               LEFT JOIN users u ON n.sender_id = u.id
               WHERE n.user_id = ?";
 
-        if ($is_opened) {
-            $query .= " AND n.is_opened = 1";
-        } else {
-            $query .= " AND n.is_opened = 0";
-        }
+        // ✅ فلترة حسب حالة الفتح
+        $query .= $is_opened
+            ? " AND n.is_opened = 1"
+            : " AND n.is_opened = 0";
+
+        // ✅ فلترة حسب تاريخ اليوم (من الحقل DATETIME)
+        $query .= " AND DATE(n.created_at) = ?";
 
         $query .= " ORDER BY n.created_at DESC";
 
         $stmt = $db->prepare($query);
-        $stmt->execute([$user_id]);
+        $stmt->execute([$user_id, $day]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 }
