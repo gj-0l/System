@@ -159,13 +159,15 @@ if ($method === 'POST') {
                     BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
                     'requester',
+                    true
                 );
 
                 EmailController::sendEmail(
                     "request cancelled",
                     "executer cancelled your request {$res['token']}, see the details via " . BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     [],
-                    "requester"
+                    "requester",
+                    true
                 );
             }
             break;

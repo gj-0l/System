@@ -54,6 +54,9 @@ class AuthController
                     case 'requester':
                         header("Location: " . BASE_URL . "/public/requester_calendar.php");
                         break;
+                    case 'manager':
+                        header("Location: " . BASE_URL . "/public/requester_calendar.php");
+                        break;
                     case 'admin':
                         header("Location: " . BASE_URL . "/public/admin.php");
                         break;
@@ -140,7 +143,7 @@ class AuthController
     }
 
 
-    public static function update_user($id, $name, $email, $password, $type, $status)
+    public static function update_user($id, $manager_id, $name, $email, $password, $type, $status)
     {
         $db = Database::getInstance()->getConnection();
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
@@ -148,11 +151,11 @@ class AuthController
         try {
             if (!empty($password)) {
                 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-                $stmt = $db->prepare("UPDATE users SET name = ?, email = ?, password = ?, type = ?, status = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $hashed_password, $type, $status, $id]);
+                $stmt = $db->prepare("UPDATE users SET manager_id =?, name = ?, email = ?, password = ?, type = ?, status = ? WHERE id = ?");
+                $stmt->execute([$manager_id, $name, $email, $hashed_password, $type, $status, $id]);
             } else {
-                $stmt = $db->prepare("UPDATE users SET name = ?, email = ?, type = ?, status = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $type, $status, $id]);
+                $stmt = $db->prepare("UPDATE users SET manager_id =?, name = ?, email = ?, type = ?, status = ? WHERE id = ?");
+                $stmt->execute([$manager_id, $name, $email, $type, $status, $id]);
             }
 
             return [

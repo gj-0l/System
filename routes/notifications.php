@@ -26,7 +26,7 @@ if ($action === 'save_token' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'get_notifications' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
-        $is_opened = true;
+        $is_opened = null;
         $day = $_GET['day'] ?? null;
         $notifications = NotificationController::getUserNotifications($user_id, $is_opened, $day);
         echo json_encode(['success' => true, 'notifications' => $notifications]);

@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../tools/sidebar.php';
 require_once __DIR__ . '/../../tools/navbar.php';
-
 ?>
 
 <!DOCTYPE html>
@@ -9,12 +8,12 @@ require_once __DIR__ . '/../../tools/navbar.php';
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" /><title>إضافة معدّة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تعديل المستخدم</title>
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- <link rel="stylesheet" href="../public/css/style.css"> -->
 
     <style>
         * {
@@ -80,26 +79,6 @@ require_once __DIR__ . '/../../tools/navbar.php';
         .btn:hover {
             background-color: #22939b;
         }
-
-        p {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 15px;
-        }
-
-        a {
-            color: #1d8e96;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .error {
-            display: none;
-        }
     </style>
 </head>
 
@@ -109,67 +88,81 @@ require_once __DIR__ . '/../../tools/navbar.php';
         <?php renderSidebar('users'); ?>
 
         <main class="p-6 ml-4 md:pl-64" dir="rtl">
-            <h2 class="title"> Singup</h2>
+            <h2 class="title">تعديل المستخدم</h2>
 
             <form id="equipmentForm" method="post" onsubmit="return updateUser(event)">
                 <div class="input-field">
                     <input type="text" name="name" id="name" placeholder="Name.." required />
                 </div>
+
                 <div class="input-field">
                     <input type="email" name="email" id="email" placeholder="Email..." required />
                 </div>
+
                 <div class="input-field">
                     <input type="password" name="password" id="password" placeholder="Password" />
                 </div>
+
                 <div class="input-field">
                     <select name="type" id="type" required>
                         <option value="">Type Accounting</option>
                         <option value="execution">منفذ (Execution)</option>
                         <option value="requester">طالب (Requester)</option>
+                        <option value="manager">مدير (manager)</option>
                         <option value="admin">أدمن (Admin)</option>
                     </select>
                 </div>
+
                 <div class="input-field">
                     <select name="status" id="status" required>
-                        <option value="">status</option>
-                        <option value="active">active</option>
-                        <option value="inactive">inactive</option>
+                        <option value="">Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
+
+                <!-- ✅ القائمة الجديدة للمدير -->
+                <div class="input-field">
+                    <select name="manager_id" id="manager_id">
+                        <option value="">-- اختر المدير --</option>
+                    </select>
+                </div>
+
                 <input type="submit" class="btn" value="Update" />
             </form>
         </main>
     </div>
 
     <script>
-        <?php if (!empty($error)): ?>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: <?= json_encode($error) ?>,
-                    confirmButtonColor: '#0b6f76'
-                });
-        <?php endif; ?>
+        // 🔹 جلب كل المستخدمين لملء قائمة المديرين
+        function loadManagers() {
+            fetch('../routes/auth.php?action=get_users')
+                .then(res => res.json())
+                .then(data => {
+                    const managerSelect = document.getElementById('manager_id');
+                    managerSelect.innerHTML = `<option value="">-- اختر المدير --</option>`;
 
-        <?php if (!empty($success)): ?>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تمت الإضافة بنجاح',
-                    confirmButtonColor: '#0b6f76'
-                }).then(() => {
-                    document.getElementById('equipmentForm').reset();
+                    if (data.success && Array.isArray(data.users)) {
+                        data.users.forEach(user => {
+                            const option = document.createElement('option');
+                            option.value = user.id;
+                            option.textContent = user.name;
+                            managerSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading managers:', err);
                 });
-        <?php endif; ?>
-    </script>
+        }
 
-    <script>
-        // Get user id from URL
+        // 🔹 الحصول على user_id من الرابط
         function getUserIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
         }
 
-        // Fetch user details and fill the form
+        // 🔹 جلب بيانات المستخدم لملء الحقول
         function fetchUserDetails() {
             const userId = getUserIdFromUrl();
             if (!userId) {
@@ -177,12 +170,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 return;
             }
 
-            fetch(`../routes/user.php?id=${userId}&action=get_user`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
+            fetch(`../routes/user.php?id=${userId}&action=get_user`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.user) {
@@ -190,6 +178,11 @@ require_once __DIR__ . '/../../tools/navbar.php';
                         document.getElementById("email").value = data.user.email;
                         document.getElementById("type").value = data.user.type;
                         document.getElementById("status").value = data.user.status;
+
+                        // 🔹 بعد تحميل المدراء، نحدد المدير الحالي
+                        setTimeout(() => {
+                            document.getElementById("manager_id").value = data.user.manager_id || "";
+                        }, 300);
                     } else {
                         Swal.fire("خطأ", data.message || "تعذر جلب بيانات المستخدم", "error");
                     }
@@ -199,10 +192,13 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 });
         }
 
-        // Call fetchUserDetails on page load
-        window.onload = fetchUserDetails;
+        // 🔹 استدعاء الدوال عند تحميل الصفحة
+        window.onload = function () {
+            loadManagers();
+            fetchUserDetails();
+        };
 
-        // Update user function (example)
+        // 🔹 دالة تحديث المستخدم
         function updateUser(event) {
             event.preventDefault();
 
@@ -212,6 +208,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
             const password = document.getElementById("password").value.trim();
             const type = document.getElementById("type").value;
             const status = document.getElementById("status").value;
+            const manager_id = document.getElementById("manager_id").value || null;
 
             if (!name || !email || !type) {
                 Swal.fire("تنبيه", "يرجى تعبئة جميع الحقول", "warning");
@@ -220,9 +217,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
 
             fetch("../routes/user.php", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     action: "update",
                     id: userId,
@@ -230,7 +225,8 @@ require_once __DIR__ . '/../../tools/navbar.php';
                     email,
                     password,
                     type,
-                    status
+                    status,
+                    manager_id
                 })
             })
                 .then(res => res.json())
@@ -246,7 +242,6 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 });
         }
     </script>
-
 </body>
 
 </html>

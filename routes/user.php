@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'update':
             $id = intval($input['id'] ?? 0);
+            $manager_id = isset($data['manager_id']) && !empty($data['manager_id']) ? $data['manager_id'] : null;
             $name = trim($input['name'] ?? '');
             $email = trim($input['email'] ?? '');
             $type = trim($input['type'] ?? '');
@@ -64,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = isset($input['password']) ? trim($input['password']) : null;
 
             if ($id && $name && $email && $type && $status) {
-                respond(AuthController::update_user($id, $name, $email, $password, $type, $status));
+                respond(AuthController::update_user($id, $manager_id, $name, $email, $password, $type, $status));
             } else {
                 respond(['success' => false, 'message' => 'جميع الحقول مطلوبة']);
             }
