@@ -237,18 +237,22 @@ $status = strtolower(trim($event['status']));
         }
 
         // عرض الأزرار حسب الحالة
+        const USER_TYPE = <?= json_encode($_SESSION['user_type'] ?? '') ?>;
+
         function renderActions(status) {
             const actions = document.getElementById("actions");
             const s = (status || '').toLowerCase().trim();
 
             let buttons = '';
-            if (s === 'pending') {
-                buttons = `
+            if (USER_TYPE === 'execution') {
+                if (s === 'pending') {
+                    buttons = `
                     <button class="btn-approve" onclick="handleAction('start')">✅ Start</button>
                     <button class="btn-reject" onclick="handleAction('cancel')">❌ Cancel</button>`;
-            } else if (s === 'started') {
-                buttons = `
+                } else if (s === 'started') {
+                    buttons = `
                     <button class="btn-reject" onclick="handleAction('cancel')">❌ Cancel</button>`;
+                }
             }
             actions.innerHTML = buttons;
         }

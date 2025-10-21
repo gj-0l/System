@@ -55,7 +55,7 @@ class AuthController
                         header("Location: " . BASE_URL . "/public/requester_calendar.php");
                         break;
                     case 'manager':
-                        header("Location: " . BASE_URL . "/public/requester_calendar.php");
+                        header("Location: " . BASE_URL . "/public/manager.php");
                         break;
                     case 'admin':
                         header("Location: " . BASE_URL . "/public/admin.php");

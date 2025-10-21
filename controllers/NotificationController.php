@@ -31,7 +31,6 @@ class NotificationController
                 return ['success' => false, 'message' => 'For requester, you must provide target_user_ids'];
             }
 
-            // جلب المستخدمين حسب النوع
             $stmt = $db->prepare("SELECT id FROM users WHERE type = ?");
             $stmt->execute([$target_type]);
             $target_user_ids = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
@@ -42,40 +41,45 @@ class NotificationController
         }
 
         $created_at = date('Y-m-d H:i:s');
+        $insertStmt = $db->prepare("
+        INSERT INTO notifications (title, body, user_id, url, is_opened, created_at, sender_id)
+        VALUES (?, ?, ?, ?, 0, ?, ?)
+    ");
 
-        // ✅ إدراج الإشعارات في قاعدة البيانات
-        $stmt = $db->prepare("INSERT INTO notifications (title, body, user_id, url, is_opened, created_at, sender_id) VALUES (?, ?, ?, ?, 0, ?, ?)");
+        // إرسال الإشعار إلى المستخدمين المحددين
         foreach ($target_user_ids as $user_id) {
-            $stmt->execute([$title, $body, $user_id, $url, $created_at, $sender_id]);
+            $insertStmt->execute([$title, $body, $user_id, $url, $created_at, $sender_id]);
         }
 
-        // ✅ إضافة مدير المرسل كهدف إضافي في حال التفعيل
+        // 🔹 إرسال إشعار إلى مدير المرسل إذا مفعّل الخيار
+        $manager_sent = false;
         if ($include_manager_of_sender && !empty($sender_id)) {
-            $stmt = $db->prepare("SELECT u2.id 
-                              FROM users u1 
-                              JOIN users u2 ON u1.manager_id = u2.id 
-                              WHERE u1.id = ? 
-                              LIMIT 1");
-            $stmt->execute([$sender_id]);
-            $manager_id = $stmt->fetchColumn();
+            $managerStmt = $db->prepare("SELECT manager_id FROM users WHERE id = ? LIMIT 1");
+            $managerStmt->execute([$sender_id]);
+            $manager_id = $managerStmt->fetchColumn();
 
             if (!empty($manager_id)) {
-                // أضف الإشعار إلى المدير أيضاً
-                $stmt->execute([$title, $body, $manager_id, $url, $created_at, $sender_id]);
+                $insertStmt->execute([$title, $body, $manager_id, $url, $created_at, $sender_id]);
+                $manager_sent = true;
             }
         }
 
-        // ✅ جلب الرموز FCM فقط للمستلمين الأصليين (بدون مدير المرسل)
+        // 🔹 جلب الرموز FCM (اختياري)
         $in = str_repeat('?,', count($target_user_ids) - 1) . '?';
         $tokenStmt = $db->prepare("SELECT token FROM users WHERE id IN ($in) AND token IS NOT NULL");
         $tokenStmt->execute($target_user_ids);
         $tokens = array_column($tokenStmt->fetchAll(PDO::FETCH_ASSOC), 'token');
 
-        // // إرسال إلى Firebase (اختياري)
         // if (!empty($tokens)) self::sendToFirebase($tokens, $title, $body, $url);
 
-        return ['success' => true];
+        return [
+            'success' => true,
+            'message' => $manager_sent
+                ? 'Notifications sent successfully (including sender manager).'
+                : 'Notifications sent successfully (no manager found for sender).'
+        ];
     }
+
 
 
 

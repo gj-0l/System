@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'update':
             $id = intval($input['id'] ?? 0);
-            $manager_id = isset($data['manager_id']) && !empty($data['manager_id']) ? $data['manager_id'] : null;
+            $manager_id = isset($input['manager_id']) && $input['manager_id'] !== '' ? intval($input['manager_id']) : null;
             $name = trim($input['name'] ?? '');
             $email = trim($input['email'] ?? '');
             $type = trim($input['type'] ?? '');
