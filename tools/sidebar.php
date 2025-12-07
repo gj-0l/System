@@ -62,6 +62,11 @@ function renderSidebar($activePage = '')
                     'href' => BASE_URL . '/public/checklist.php',
                     'icon' => '<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />'
                 ],
+                'today_requests' => [
+                    'label' => 'Today Requests',
+                    'href' => BASE_URL . '/public/events.php',
+                    'icon' => '<path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" />'
+                ],
 
             ];
             break;

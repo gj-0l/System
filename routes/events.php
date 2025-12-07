@@ -111,14 +111,16 @@ if ($method === 'POST') {
                     [$requesterId], // ← استبدله بمعرف الشخص اللي يستقبل الإشعار
                     BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     $_SESSION['user_id'] ?? null,
-                    'requester',
+                    null,
+                    true
                 );
 
                 EmailController::sendEmail(
                     "executer started",
                     "executer started working on your request {$res['token']}, see the details via " . BASE_URL . '/public/event_details.php?id=' . $res['token'],
                     [],
-                    "requester"
+                    null,
+                    true
                 );
             }
             break;
