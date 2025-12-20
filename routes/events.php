@@ -25,7 +25,7 @@ if ($method === 'GET') {
         case 'all_events':
             $start = $_GET['start'] ?? null;
             $end = $_GET['end'] ?? null;
-            echo json_encode(CalendarController::getEvents($start, $end));
+            echo json_encode(CalendarController::getEvents($start, $end, false, 16));
             break;
         case 'today_events':
             $start = $_GET['start'] ?? null;
@@ -46,6 +46,16 @@ if ($method === 'GET') {
         case 'events_count':
             echo json_encode(CalendarController::getEventsCountByDate());
             break;
+
+        case 'events_by_equipment':
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
+
+            echo json_encode(
+                CalendarController::getEventsGroupedByEquipment($start, $end)
+            );
+            break;
+
 
         default:
             echo json_encode(['error' => 'Invalid GET action']);

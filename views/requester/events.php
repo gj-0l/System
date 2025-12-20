@@ -134,6 +134,30 @@ require_once __DIR__ . '/../../tools/navbar.php';
         <main class="p-6 ml-4 md:pl-64">
             <h3 style="text-align:center;">Today Events List</h3>
 
+            <div class="flex flex-wrap items-end gap-4 mb-6 bg-white p-4 rounded-lg shadow">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+                    <input type="date" id="fromDate"
+                        class="border rounded-md px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                    <input type="date" id="toDate"
+                        class="border rounded-md px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+
+                <div>
+                    <button onclick="loadEvents()"
+                        class="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 transition">
+                        Filter
+                    </button>
+                </div>
+
+            </div>
+
+
             <table id="eventsTable">
                 <thead>
                     <tr>
@@ -160,12 +184,27 @@ require_once __DIR__ . '/../../tools/navbar.php';
         function loadEvents() {
             const pad = n => String(n).padStart(2, '0');
             const now = new Date();
+
+            // 🟢 التاريخ الافتراضي = اليوم
+            const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+            const fromInput = document.getElementById('fromDate');
+            const toInput = document.getElementById('toDate');
+
+            const fromDate = fromInput.value || today;
+            const toDate = toInput.value || today;
+
+            // نخلي القيم الافتراضية بالحقول
+            fromInput.value = fromDate;
+            toInput.value = toDate;
+
+            // timezone
             const tzOffset = -now.getTimezoneOffset();
             const tz = `${tzOffset >= 0 ? '+' : '-'}${pad(Math.floor(Math.abs(tzOffset) / 60))}:${pad(Math.abs(tzOffset) % 60)}`;
 
-            const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-            const start = `${today}T00:00:00${tz}`;
-            const end = `${today}T23:59:00${tz}`;
+            const start = `${fromDate}T00:00:00${tz}`;
+            const end = `${toDate}T23:59:59${tz}`;
+
             fetch(`${BASE_URL}/routes/events.php?action=all_events&start=${start}&end=${end}`)
                 .then(res => res.json())
                 .then(events => {
@@ -173,46 +212,47 @@ require_once __DIR__ . '/../../tools/navbar.php';
                     tbody.innerHTML = '';
 
                     if (!Array.isArray(events)) {
-                        tbody.innerHTML = '<tr><td colspan="7">❌ خطأ في جلب البيانات</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="8">❌ خطأ في جلب البيانات</td></tr>';
                         return;
                     }
 
                     if (events.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7">No Events</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="8">No Events</td></tr>';
                         return;
                     }
 
                     events.forEach((event, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${event.title || '-'}</td>
-                            <td>${event.status || '-'}</td>
-                            <td>${event.extendedProps.equipment_name || '-'}</td>
-                            <td>${event.extendedProps.created_by_name || '-'}</td>
-                            <td>${event.executer_start || '-'}</td>
-                            <td>${event.end || '-'}</td>
-                            <td>
-                                ${event.status === 'pending' && event.extendedProps.created_by == <?= json_encode($_SESSION['user_id']) ?>
+                    <td data-label="#">${index + 1}</td>
+                    <td data-label="Title">${event.title || '-'}</td>
+                    <td data-label="Status">${event.status || '-'}</td>
+                    <td data-label="Equipment">${event.extendedProps.equipment_name || '-'}</td>
+                    <td data-label="Requester">${event.extendedProps.created_by_name || '-'}</td>
+                    <td data-label="Start">${event.executer_start || '-'}</td>
+                    <td data-label="End">${event.end || '-'}</td>
+                    <td data-label="Action">
+                        ${event.status === 'pending' &&
+                                event.extendedProps.created_by == <?= json_encode($_SESSION['user_id']) ?>
                                 ? `<a href="#"
-                                            data-id="${event.id}" 
-                                            onclick="deleteEvent(event)" 
-                                            style="background:#d32f2f; color:white; padding:6px 12px; border-radius:6px; text-decoration:none;">
-                                            Delete
-                                        </a>`
+                                    data-id="${event.id}"
+                                    onclick="deleteEvent(event)"
+                                    style="background:#d32f2f;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;">
+                                    Delete
+                                   </a>`
                                 : '-'
                             }
-                            </td>
-                        `;
+                    </td>
+                `;
                         tbody.appendChild(row);
                     });
                 })
-                .catch(error => {
-                    console.error('Error fetching events:', error);
+                .catch(() => {
                     document.getElementById('eventsTableBody').innerHTML =
-                        '<tr><td colspan="7">⚠️ فشل في الاتصال بالخادم</td></tr>';
+                        '<tr><td colspan="8">⚠️ فشل في الاتصال بالخادم</td></tr>';
                 });
         }
+
 
         // 🔹 دالة الحذف
         function deleteEvent(e) {

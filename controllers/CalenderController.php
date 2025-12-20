@@ -7,52 +7,63 @@ class CalendarController
 {
 
     // Get events (optionally by date range or user)
-    public static function getEvents($start = null, $end = null, $executer_start = null)
+    public static function getEvents($start = null, $end = null, $executer_start = null, $equipment_id = null)
     {
         $db = Database::getInstance()->getConnection();
 
-        // If start/end provided, filter between them -- FullCalendar sends ISO dates
-        if ($start && $end) {
-            $query = "
-            SELECT events.*, 
-                equipment.equipment_name, 
-                creator.name AS created_by_name
-            FROM events 
-            LEFT JOIN equipment ON events.equipment_id = equipment.id
-            LEFT JOIN users AS creator ON events.created_by = creator.id
-            WHERE events.start >= ? 
-              AND events.start <= ?
-        ";
-            if ($executer_start) {
-                $query .= " AND events.executer_start IS NOT NULL ";
-            }
-            $stmt = $db->prepare($query);
-            $stmt->execute([$start, $end]);
-        } else {
-            $stmt = $db->query("
-            SELECT 
-                events.*, 
-                equipment.equipment_name, 
-                creator.name AS created_by_name
-            FROM events
-            LEFT JOIN equipment ON events.equipment_id = equipment.id
-            LEFT JOIN users AS creator ON events.created_by = creator.id
-            ORDER BY events.start ASC
+        $params = [];
+        $conditions = [];
 
-        ");
+        // فلترة حسب التاريخ
+        if ($start && $end) {
+            $conditions[] = "events.start >= ?";
+            $conditions[] = "events.start <= ?";
+            $params[] = $start;
+            $params[] = $end;
         }
+
+        // فلترة executer_start
+        if ($executer_start) {
+            $conditions[] = "events.executer_start IS NOT NULL";
+        }
+
+        // ✅ فلترة حسب المعدة
+        if (!empty($equipment_id)) {
+            $conditions[] = "events.equipment_id = ?";
+            $params[] = $equipment_id;
+        }
+
+        $whereSql = '';
+        if (!empty($conditions)) {
+            $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql = "
+        SELECT 
+            events.*, 
+            equipment.equipment_name, 
+            creator.name AS created_by_name
+        FROM events
+        LEFT JOIN equipment ON events.equipment_id = equipment.id
+        LEFT JOIN users AS creator ON events.created_by = creator.id
+        $whereSql
+        ORDER BY events.start ASC
+    ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Map DB rows to FullCalendar event object shape
-        $events = array_map(function ($r) {
+        // تحويل البيانات لشكل FullCalendar
+        return array_map(function ($r) {
             return [
                 'id' => $r['id'],
                 'token' => $r['token'] ?? null,
                 'title' => $r['title'] ?? null,
                 'status' => $r['status'] ?? null,
                 'start' => $r['start'] ?? null,
-                'executer_start' => $r['executer_start'],
+                'executer_start' => $r['executer_start'] ?? null,
                 'end' => $r['end'] ?? null,
                 'executer_end' => $r['executer_end'] ?? null,
                 'extendedProps' => [
@@ -66,9 +77,8 @@ class CalendarController
                 ]
             ];
         }, $rows);
-
-        return $events;
     }
+
 
 
     //get events count by created_date
@@ -91,6 +101,80 @@ class CalendarController
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (int) $result['event_count'] : 0;
     }
+
+    public static function getEventsGroupedByEquipment($start = null, $end = null)
+    {
+        $db = Database::getInstance()->getConnection();
+
+        $params = [];
+        $conditions = [];
+
+        // فلترة بالتاريخ (اختياري)
+        if ($start && $end) {
+            $conditions[] = "events.start >= ?";
+            $conditions[] = "events.start <= ?";
+            $params[] = $start;
+            $params[] = $end;
+        }
+
+        $whereSql = '';
+        if (!empty($conditions)) {
+            $whereSql = 'AND ' . implode(' AND ', $conditions);
+        }
+
+        $sql = "
+        SELECT 
+            equipment.id AS equipment_id,
+            equipment.equipment_name,
+            events.id AS event_id,
+            events.title,
+            events.status,
+            events.start,
+            events.end
+        FROM equipment
+        LEFT JOIN events 
+            ON events.equipment_id = equipment.id
+            $whereSql
+        ORDER BY equipment.equipment_name, events.start
+    ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            $eid = $row['equipment_id'];
+
+            // إنشاء المعدة أول مرة
+            if (!isset($result[$eid])) {
+                $result[$eid] = [
+                    'equipment_id' => $eid,
+                    'equipment_name' => $row['equipment_name'],
+                    'events_count' => 0,
+                    'events' => []
+                ];
+            }
+
+            // إذا أكو إيفنت
+            if (!empty($row['event_id'])) {
+                $result[$eid]['events'][] = [
+                    'id' => $row['event_id'],
+                    'title' => $row['title'],
+                    'status' => $row['status'],
+                    'start' => $row['start'],
+                    'end' => $row['end']
+                ];
+
+                $result[$eid]['events_count']++;
+            }
+        }
+
+        // إعادة ترتيب المفاتيح (من associative إلى array)
+        return array_values($result);
+    }
+
 
 
     // Add event (returns inserted id)
