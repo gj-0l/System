@@ -48,14 +48,18 @@ class EquipmentController
             $sql = "
             SELECT 
                 e.*,
-                COALESCE(cr.status, 'accepted') AS status,  -- إذا ما موجود فحص اليوم → accepted
-                cr.id AS checklist_result_id,
-                ci.id AS checklist_item_id
+                -- إذا أي نتيجة لليوم = 'rejected' → rejected، وإلا accepted
+                CASE 
+                    WHEN SUM(CASE WHEN cr.status = 'rejected' THEN 1 ELSE 0 END) > 0 
+                        THEN 'rejected'
+                    ELSE 'accepted'
+                END AS status
             FROM equipment e
             LEFT JOIN checklist_items ci ON ci.equipment_id = e.id
             LEFT JOIN checklist_results cr 
-                ON cr.checklist_id = ci.id AND DATE(cr.date) = ?  -- فلترة نتائج اليوم فقط
-            ORDER BY e.id ASC, cr.id DESC
+                ON cr.checklist_id = ci.id AND DATE(cr.date) = ?
+            GROUP BY e.id
+            ORDER BY e.id ASC
         ";
 
             $stmt = $db->prepare($sql);
@@ -72,9 +76,11 @@ class EquipmentController
     }
 
 
-    public static function updateResault($id, $status)
+
+    public static function updateResault($equipment_id, $status)
     {
         $db = Database::getInstance()->getConnection();
+        $date = date('Y-m-d'); // تحديث النتائج الخاصة باليوم فقط
 
         if (empty($status)) {
             return [
@@ -84,13 +90,18 @@ class EquipmentController
         }
 
         try {
-            $stmt = $db->prepare("UPDATE checklist_results SET status = ? WHERE id = ?");
-            $stmt->execute([$status, $id]);
-
+            // تحديث كل النتائج المرتبطة بالمعدة المحددة لليوم
+            $stmt = $db->prepare("
+            UPDATE checklist_results cr
+            INNER JOIN checklist_items ci ON cr.checklist_id = ci.id
+            SET cr.status = ?
+            WHERE ci.equipment_id = ? AND DATE(cr.date) = ?
+        ");
+            $stmt->execute([$status, $equipment_id, $date]);
 
             return [
                 'success' => true,
-                'message' => 'تم تحديث الحالة بنجاح'
+                'message' => 'تم تحديث جميع نتائج المعدة لهذا اليوم بنجاح'
             ];
         } catch (PDOException $e) {
             return [
@@ -99,6 +110,7 @@ class EquipmentController
             ];
         }
     }
+
 
 
     public static function get($id)

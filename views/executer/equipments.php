@@ -124,6 +124,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                         statusCell = `
                         <button class="status-btn" 
                                 data-id="${eq.checklist_result_id}" 
+                                data-equipment-id="${eq.id}"
                                 data-status="accepted"
                                 style="color:#d32f2f; font-weight:bold; cursor:pointer; background:none; border:none;">
                             ${eq.status}
@@ -144,6 +145,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 document.querySelectorAll('.status-btn').forEach(btn => {
                     btn.addEventListener('click', function () {
                         const checklistId = this.getAttribute('data-id');
+                        const equipmentId = this.getAttribute('data-equipment-id');
                         const newStatus = this.getAttribute('data-status');
 
                         Swal.fire({
@@ -160,7 +162,7 @@ require_once __DIR__ . '/../../tools/navbar.php';
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
-                                        id: checklistId,
+                                        id: equipmentId,
                                         status: newStatus
                                     })
                                 })
