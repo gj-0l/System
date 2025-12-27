@@ -25,7 +25,7 @@ if ($method === 'GET') {
         case 'all_events':
             $start = $_GET['start'] ?? null;
             $end = $_GET['end'] ?? null;
-            echo json_encode(CalendarController::getEvents($start, $end, false, 16));
+            echo json_encode(CalendarController::getEvents($start, $end, false));
             break;
         case 'today_events':
             $start = $_GET['start'] ?? null;

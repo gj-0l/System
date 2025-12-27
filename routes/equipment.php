@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         respond($result);
     } else {
         // إذا ماكو id → يجيب كل المعدات مع حالتها اليوم
-        $result = EquipmentController::listWithTodayStatus();
+        $result = EquipmentController::list();
         respond($result);
     }
 }

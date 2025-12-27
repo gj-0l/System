@@ -46,19 +46,17 @@ class EquipmentController
 
         try {
             $sql = "
-                SELECT 
-                    e.*,
-                    cr.status,
-                    cr.id AS checklist_result_id,
-                    ci.id AS checklist_item_id
-                FROM equipment e
-                INNER JOIN checklist_items ci ON ci.equipment_id = e.id
-                INNER JOIN checklist_results cr ON cr.checklist_id = ci.id
-                WHERE DATE(cr.date) = ?
-                ORDER BY e.id ASC, cr.id DESC;
-
-            ";
-
+            SELECT 
+                e.*,
+                COALESCE(cr.status, 'accepted') AS status,  -- إذا ما موجود فحص اليوم → accepted
+                cr.id AS checklist_result_id,
+                ci.id AS checklist_item_id
+            FROM equipment e
+            LEFT JOIN checklist_items ci ON ci.equipment_id = e.id
+            LEFT JOIN checklist_results cr 
+                ON cr.checklist_id = ci.id AND DATE(cr.date) = ?  -- فلترة نتائج اليوم فقط
+            ORDER BY e.id ASC, cr.id DESC
+        ";
 
             $stmt = $db->prepare($sql);
             $stmt->execute([$date]);
@@ -72,6 +70,7 @@ class EquipmentController
             ];
         }
     }
+
 
     public static function updateResault($id, $status)
     {
