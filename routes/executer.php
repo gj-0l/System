@@ -8,7 +8,7 @@ session_start();
 header('Content-Type: application/json');
 
 if (
-    !isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'execution'
+    !isset($_SESSION['user_id']) || ($_SESSION['user_type'] !== 'execution' && $_SESSION['user_type'] !== 'admin')
 ) {
     respond(['success' => false, 'message' => 'غير مصرح لك']);
 }

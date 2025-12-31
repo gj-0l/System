@@ -27,22 +27,23 @@ require_once __DIR__ . '/../../tools/navbar.php';
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
 
         th,
         td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #c8e6c9;
-            text-align: right;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #a8e6cf;
-            color: #1d8e96;
+            background-color: #a5d6a7;
+            color: #333;
         }
 
         tr:hover {
-            background-color: #f1f8f4;
+            background-color: #f1f8e9;
         }
 
         .logout {
@@ -99,8 +100,8 @@ require_once __DIR__ . '/../../tools/navbar.php';
                 content: attr(data-label);
                 font-weight: bold;
                 position: absolute;
-                right: 10px;
-                /* ✅ الليبل على اليمين */
+                left: 10px;
+                /* ✅ الليبل على اليسار */
                 top: 50%;
                 transform: translateY(-50%);
                 white-space: nowrap;
