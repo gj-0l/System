@@ -225,8 +225,8 @@ session_start()
                 headerToolbar: { start: null, center: "title", end: null },
                 selectable: false, // ❌ يمنع الإضافة عن طريق تحديد وقت بالكالندر
                 allDaySlot: false, // نخلي فقط الساعات
-                slotMinTime: "08:00:00", // ✅ البداية من الساعة 8 صباحاً
-                slotMaxTime: "24:00:00", // ✅ لحد 12 بالليل
+                slotMinTime: "08:30:00", // ✅ البداية من الساعة 8:30 صباحاً
+                slotMaxTime: "16:15:00", // ✅ لحد 4 مساءً (مع إظهار خط الساعة 4)
 
                 eventContent: function (arg) {
                     const time = document.createElement("span");
@@ -331,8 +331,8 @@ session_start()
         `,
                     didOpen: () => {
                         const now = new Date();
-                        const minTime = "08:00";
-                        const maxTime = "23:59";
+                        const minTime = "08:30";
+                        const maxTime = "16:00";
 
                         flatpickr('#ev-start', {
                             noCalendar: true,
@@ -376,13 +376,30 @@ session_start()
                         // 🔒 منع اختيار وقت فائت
                         const now = new Date();
                         const [hour, minute] = startTime.split(':').map(Number);
-                        const currentHour = now.getHours();
-                        const currentMinute = now.getMinutes();
+                        const startVal = hour * 60 + minute;
+                        const minRangeVal = 8 * 60 + 30; // 08:30
+                        const maxRangeVal = 16 * 60; // 16:00
 
-                        if (hour < 8 || hour > 23 || (hour === 23 && minute > 59)) {
-                            Swal.showValidationMessage('Time must be between 08:00 and 23:59.');
+                        if (startVal < minRangeVal || startVal > maxRangeVal) {
+                            Swal.showValidationMessage('Time must be between 08:30 and 16:00.');
                             return false;
                         }
+
+                        if (endTime) {
+                            const [hEnd, mEnd] = endTime.split(':').map(Number);
+                            const endVal = hEnd * 60 + mEnd;
+                            if (endVal < minRangeVal || endVal > maxRangeVal) {
+                                Swal.showValidationMessage('End time must be between 08:30 and 16:00.');
+                                return false;
+                            }
+                            if (endVal <= startVal) {
+                                Swal.showValidationMessage('End time must be after start time.');
+                                return false;
+                            }
+                        }
+
+                        const currentHour = now.getHours();
+                        const currentMinute = now.getMinutes();
 
                         if (hour < currentHour || (hour === currentHour && minute < currentMinute)) {
                             Swal.showValidationMessage('Cannot select a past time.');

@@ -68,6 +68,22 @@ if ($method === 'POST') {
 
     switch ($action) {
         case 'add':
+            // Server-side validation for time range (08:30 - 16:00)
+            if (isset($input['start'])) {
+                $startTime = date('H:i', strtotime($input['start']));
+                if ($startTime < '08:30' || $startTime > '16:00') {
+                    echo json_encode(['success' => false, 'message' => 'Start time must be between 08:30 and 16:00']);
+                    exit;
+                }
+            }
+            if (isset($input['end']) && !empty($input['end'])) {
+                $endTime = date('H:i', strtotime($input['end']));
+                if ($endTime < '08:30' || $endTime > '16:00') {
+                    echo json_encode(['success' => false, 'message' => 'End time must be between 08:30 and 16:00']);
+                    exit;
+                }
+            }
+
             $res = CalendarController::addEvent($input);
             echo json_encode($res);
 

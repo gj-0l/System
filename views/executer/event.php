@@ -285,10 +285,17 @@ $status = strtolower(trim($event['status']));
         // إرسال الأكشن للسيرفر
         function sendAction(action, reason = null) {
             fetch(`../routes/events.php?action=${action}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id, executerId, reason, requesterId })
-            })
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        id,
+                        executerId,
+                        reason,
+                        requesterId
+                    })
+                })
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
