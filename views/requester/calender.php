@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../tools/sidebar.php';
 require_once __DIR__ . '/../../tools/navbar.php';
 
 session_start()
-    ?>
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -182,8 +182,12 @@ session_start()
                 .replace(/'/g, '&#039;');
 
             const formatDate = dateStr => !dateStr ? '' : new Date(dateStr).toLocaleString('en-US', {
-                month: '2-digit', day: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: true
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
             });
 
             const getTimeFromStr = datetimeStr => {
@@ -217,18 +221,22 @@ session_start()
                 "#fcd34d", // أصفر باستيل
                 "#f9a8d4", // وردي هادئ
                 "#a5b4fc", // بنفسجي فاتح
-                "#67e8f9"  // سماوي
+                "#67e8f9" // سماوي
             ];
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: "timeGridDay",
-                headerToolbar: { start: null, center: "title", end: null },
+                headerToolbar: {
+                    start: null,
+                    center: "title",
+                    end: null
+                },
                 selectable: false, // ❌ يمنع الإضافة عن طريق تحديد وقت بالكالندر
                 allDaySlot: false, // نخلي فقط الساعات
                 slotMinTime: "08:30:00", // ✅ البداية من الساعة 8:30 صباحاً
                 slotMaxTime: "16:15:00", // ✅ لحد 4 مساءً (مع إظهار خط الساعة 4)
 
-                eventContent: function (arg) {
+                eventContent: function(arg) {
                     const time = document.createElement("span");
                     time.textContent = arg.timeText;
                     time.style.fontSize = "13px";
@@ -251,12 +259,14 @@ session_start()
                     wrapper.appendChild(time);
                     wrapper.appendChild(title);
 
-                    return { domNodes: [wrapper] };
+                    return {
+                        domNodes: [wrapper]
+                    };
                 },
 
 
 
-                eventDidMount: function (info) {
+                eventDidMount: function(info) {
                     const color = eventColors[info.event.id % eventColors.length];
 
                     info.el.style.background = color;
@@ -310,11 +320,13 @@ session_start()
                 const endTime = getTimeFromStr(endStr || startStr);
                 const types = await fetchTypes();
 
-                const typeOptionsHtml = types.length
-                    ? types.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.equipment_name ?? t.slug)}</option>`).join('')
-                    : '<option value="">-- No types available --</option>';
+                const typeOptionsHtml = types.length ?
+                    types.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.equipment_name ?? t.slug)}</option>`).join('') :
+                    '<option value="">-- No types available --</option>';
 
-                const { value: form } = await Swal.fire({
+                const {
+                    value: form
+                } = await Swal.fire({
                     title: `Add New Request`,
                     html: `
                     <div style="display:flex;flex-direction:column;gap:10px;text-align:left;">
@@ -331,7 +343,7 @@ session_start()
         `,
                     didOpen: () => {
                         const now = new Date();
-                        const minTime = "08:30";
+                        const minTime = "07:30";
                         const maxTime = "16:00";
 
                         flatpickr('#ev-start', {
@@ -411,7 +423,17 @@ session_start()
                         const start = `${today} ${startTime}:00`;
                         const end = endTime ? `${today} ${endTime}:00` : null;
 
-                        return { equipment_id, token, title, start, end, area, location, worktype, description };
+                        return {
+                            equipment_id,
+                            token,
+                            title,
+                            start,
+                            end,
+                            area,
+                            location,
+                            worktype,
+                            description
+                        };
                     }
                 });
 
@@ -420,7 +442,9 @@ session_start()
                 try {
                     const res = await fetch(`${BASE_URL}/routes/events.php?action=add`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(form)
                     });
                     const json = await res.json();
@@ -443,7 +467,13 @@ session_start()
                             console.error('Error updating events or todayEventCount', err);
                         }
 
-                        Swal.fire({ icon: 'success', title: 'Added', text: 'Event added successfully.', timer: 1400, showConfirmButton: false });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added',
+                            text: 'Event added successfully.',
+                            timer: 1400,
+                            showConfirmButton: false
+                        });
                     } else {
                         Swal.fire('Error', json.message || 'Add failed', 'error');
                     }
@@ -495,13 +525,22 @@ session_start()
                     try {
                         const res = await fetch(`${BASE_URL}/routes/events.php?action=delete`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: info.event.id })
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: info.event.id
+                            })
                         });
                         const json = await res.json();
                         if (json.success) {
                             info.event.remove();
-                            Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted',
+                                timer: 1200,
+                                showConfirmButton: false
+                            });
                         } else {
                             Swal.fire('Error', json.message || 'Delete failed', 'error');
                         }
